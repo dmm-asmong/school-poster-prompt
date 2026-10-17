@@ -20,6 +20,8 @@ export type BuilderState = {
   mood: string | null;
   /** null 이면 홍보물 종류에 맞는 기본 스타일 */
   style: string | null;
+  /** 스타일 안의 표현 방식 (null 이면 그 스타일의 기본) */
+  styleVariant: string | null;
   /** 메인 장면을 직접 적을 때 (비우면 주제에 맞춰 자동) */
   scene: string;
   /** 갤러리 예시용 영어 장면 설명 (사용자가 장면을 고치면 비워요) */
@@ -84,6 +86,7 @@ export const DEFAULT_STATE: BuilderState = {
   format: "live",
   mood: "trust",
   style: null,
+  styleVariant: null,
   scene: "",
   sceneEn: "",
   swipeCue: true,

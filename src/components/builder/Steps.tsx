@@ -12,6 +12,7 @@ import {
   type OutputId,
 } from "@/data/options";
 import { CERT_ROLES, CERT_STYLES } from "@/lib/certificate";
+import { variantFor } from "@/lib/prompt";
 import { INFO_KEYS, type BuilderState, type InfoKey, type InfoMode } from "@/lib/state";
 import type { ResolvedInfo } from "@/lib/suggest";
 import { Chips, Field, StepCard, Toggle, inputClass } from "../ui";
@@ -260,6 +261,7 @@ export function StepDesign({ state, onPatch }: Common) {
   const cert = state.output === "certificate";
   const custom = !BRAND_COLORS.some((c) => c.id === state.color);
   const auto = resolveStyle(null, state.output, Boolean(byId(PLATFORMS, state.platform)?.print));
+  const styleNow = resolveStyle(state.style, state.output, Boolean(byId(PLATFORMS, state.platform)?.print));
   const toggleAvoid = (id: string) =>
     onPatch({ avoid: state.avoid.includes(id) ? state.avoid.filter((a) => a !== id) : [...state.avoid, id] });
   return (
@@ -288,11 +290,21 @@ export function StepDesign({ state, onPatch }: Common) {
       ) : (
         <>
       <Field label="디자인 스타일" hint={state.style ? "다시 누르면 자동 추천으로" : `자동 추천: ${auto.label}`}>
-        <Chips ariaLabel="디자인 스타일" allowDeselect options={STYLES} value={state.style} onChange={(style) => onPatch({ style })} />
+        <Chips ariaLabel="디자인 스타일" allowDeselect options={STYLES} value={state.style} onChange={(style) => onPatch({ style, styleVariant: null })} />
         <p className="mt-2 text-xs text-zinc-500">
           스타일마다 서체·구도·색 쓰는 법·질감이 달라요.
         </p>
       </Field>
+      {styleNow.variants && (
+        <Field label="표현 방식" hint={`${styleNow.label} 스타일 안에서`}>
+          <Chips
+            ariaLabel="표현 방식"
+            options={styleNow.variants}
+            value={variantFor(state)?.id ?? null}
+            onChange={(id) => id && onPatch({ styleVariant: id })}
+          />
+        </Field>
+      )}
       <Field label="메인 장면 · 비주얼" htmlFor="scene" hint="비우면 주제·스타일에 맞춰 자동">
         <input
           id="scene"

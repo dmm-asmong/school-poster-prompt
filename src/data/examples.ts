@@ -247,8 +247,9 @@ export const EXAMPLES: Example[] = [
       mood: "energy",
       style: "youtube",
       color: "yellow",
-      scene: "편집 타임라인이 뜬 모니터 옆에서 턱을 괴고 생각하는 안경 쓴 젊은 크리에이터, 뒤에 영상 카메라와 조명",
-      sceneEn: "a young creator with glasses, chin in hand, thinking beside a monitor showing a video-editing timeline, with a video camera and a studio light behind",
+      styleVariant: "illust",
+      scene: "안경 쓴 젊은 크리에이터 캐릭터가 턱을 괴고 생각하는 모습, 뒤에 영상 카메라와 스튜디오 조명, 재생 버튼이 뜬 화면, 편집 타임라인, 우상향 막대그래프와 화살표",
+      sceneEn: "a young creator character with glasses, chin in hand, thinking; behind him a video camera on a tripod and a studio light, a screen with a big play button, a video-editing timeline, and a rising bar chart with an upward arrow",
       info: {
         title: { mode: "exact", value: "AI 툴 5개로 영상 10배 빠르게" },
         subtitle: { mode: "exact", value: "편집 시간 90% 절약" },

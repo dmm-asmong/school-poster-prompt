@@ -10,6 +10,7 @@ import {
   resolveStyle,
   type Label,
   type Style,
+  type StyleVariant,
 } from "@/data/options";
 import { CERT_STYLES, buildCertificatePrompt, certTexts } from "./certificate";
 import type { DayKey } from "./dates";
@@ -117,13 +118,26 @@ export function styleBadge(state: BuilderState): { emoji: string; label: string 
     return state.certMockup ? { emoji: "📷", label: "홍보용 목업" } : { emoji: c.emoji, label: c.label };
   }
   const s = styleFor(state);
-  return { emoji: s.emoji ?? "", label: s.label };
+  const v = variantFor(state);
+  return v && v !== s.variants?.[0] ? { emoji: v.emoji ?? s.emoji ?? "", label: `${s.label} · ${v.label}` } : { emoji: s.emoji ?? "", label: s.label };
 }
 
-/** 프롬프트에 쓰는 스타일 (고르지 않았으면 홍보물에 맞는 기본값) */
-export function styleFor(state: BuilderState): Style {
+/** 고른 스타일의 표현 방식 (없으면 첫 번째) */
+export function variantFor(state: BuilderState): StyleVariant | undefined {
+  const base = baseStyleFor(state);
+  return base.variants?.find((v) => v.id === state.styleVariant) ?? base.variants?.[0];
+}
+
+function baseStyleFor(state: BuilderState): Style {
   const platform = byId(PLATFORMS, state.platform) ?? PLATFORMS[0];
   return resolveStyle(state.style, state.output, Boolean(platform.print));
+}
+
+/** 프롬프트에 쓰는 스타일 (고르지 않았으면 홍보물에 맞는 기본값, 표현 방식 문장까지 반영) */
+export function styleFor(state: BuilderState): Style {
+  const base = baseStyleFor(state);
+  const v = base.variants?.find((x) => x.id === state.styleVariant);
+  return v?.overrides ? { ...base, ...v.overrides } : base;
 }
 
 export function buildPrompt(state: BuilderState, lang: Lang, today: DayKey | null = null): string {
@@ -147,6 +161,7 @@ export function buildPrompt(state: BuilderState, lang: Lang, today: DayKey | nul
     .filter((x) => x !== undefined);
   const showFormat = format && output.id !== "profile" && output.id !== "certificate";
   const scene = state.scene.trim();
+  const antiAi = variantFor(state)?.avoid ?? ANTI_AI;
   const sections: string[] = [];
 
   if (lang === "ko") {
@@ -159,16 +174,16 @@ export function buildPrompt(state: BuilderState, lang: Lang, today: DayKey | nul
     sections.push(
       `디자인 브리프: ${lead}${josa(output.phrase.ko, "을", "를")} 만들어 줘. ${cert ? "실제 교육기관이 발급하는 증서 수준의 완성도로." : "한국 에이전시 디자이너가 만든 실제 캠페인 결과물처럼."} 뻔한 템플릿이 아니라 이 아트 디렉션에 맞춘 의도적인 구도로 — 스타일이 요구하지 않는 한 '왼쪽 헤드라인 + 오른쪽 이미지' 같은 흔한 분할은 피해.`,
     );
-    sections.push(`아트 디렉션: ${style.brief.ko}.${mood ? ` 톤: ${mood.label}.` : ""}`);
+    sections.push(`아트 디렉션: ${fillStyle(style.brief.ko, vars)}.${mood ? ` 톤: ${mood.label}.` : ""}`);
     sections.push(
       `캔버스: ${platform.label} ${platform.px}, 비율 ${platform.ratio}. 안전 영역: ${platform.safe.ko}.${flatPrint ? " 정면에서 본 평면 인쇄용 원고 그대로 캔버스 가장자리까지 꽉 채워 — 목업·사진·책상·원근·그림자 없음." : ""}`,
     );
     sections.push(
       `레이아웃: ${fillStyle(style.layout.ko, vars)}. 이 홍보물은 ${output.essentials.ko}. 정보 위계: ${output.hierarchy.ko}.${state.qrSlot ? " 오른쪽 아래 안전 여백 안쪽에 QR 코드를 붙일 단색 정사각형 빈칸(가짜 QR 무늬 금지)." : ""}`,
     );
-    sections.push(`타이포그래피: ${style.type.ko}. 글자와 배경의 대비는 충분히.`);
+    sections.push(`타이포그래피: ${fillStyle(style.type.ko, vars)}. 글자와 배경의 대비는 충분히.`);
     sections.push(`컬러: ${fillStyle(style.palette.ko, vars)}. (브랜드 컬러 ${color.ko}, 포인트 색 ${color.accent})`);
-    sections.push(`질감·빛: ${style.texture.ko}.`);
+    sections.push(`질감·빛: ${fillStyle(style.texture.ko, vars)}.`);
     const hero = scene
       ? scene
       : state.photoSlot
@@ -190,7 +205,7 @@ export function buildPrompt(state: BuilderState, lang: Lang, today: DayKey | nul
       `들어갈 글자(따옴표 안 한글만 그대로, 각 항목은 정확히 한 번씩, 총 ${items.length}개 — 역할 이름은 쓰지 마):\n${list}${titleAi ? `\n헤드라인은 '${topic || "강의"}'가 바로 떠오르는 더 짧고 힘 있는 한글 카피(한 줄 12자 안팎, 최대 2줄)로 다듬어도 돼. 나머지는 한 글자도 바꾸지 마.` : "\n모든 글자는 한 글자도 바꾸지 마."} 목록 밖 글자는 넣지 마 — 화면·종이·간판 속 글자는 알아볼 수 없게 흐리거나 비워 둬.`,
     );
     sections.push(`제작·품질: ${platform.print ? "인쇄용 300dpi, " : ""}완성도 높은 프로 디자인 결과물, 선명한 한글.`);
-    sections.push(`피할 것: ${ANTI_AI.ko}${extraAvoid.length ? `, ${extraAvoid.map((a) => a.label).join(", ")}` : ""}.`);
+    sections.push(`피할 것: ${antiAi.ko}${extraAvoid.length ? `, ${extraAvoid.map((a) => a.label).join(", ")}` : ""}.`);
   } else {
     const vars = { B: color.en, A: `${color.accentEn} (${color.accent})` };
     const subject = topic ? `"${topic}"` : "a practical skills topic";
@@ -201,16 +216,16 @@ export function buildPrompt(state: BuilderState, lang: Lang, today: DayKey | nul
     sections.push(
       `Design brief: Create ${lead}. ${cert ? "It should look like a real certificate issued by an established academy." : "It should look like a real campaign piece by a Korean agency designer."} Use a deliberate, non-template composition built for this art direction — avoid the generic "headline left, image right" split unless the style calls for it.`,
     );
-    sections.push(`Art direction: ${style.brief.en}.${mood ? ` Tone: ${mood.en}.` : ""}`);
+    sections.push(`Art direction: ${fillStyle(style.brief.en, vars)}.${mood ? ` Tone: ${mood.en}.` : ""}`);
     sections.push(
       `Canvas: ${platform.en}, ${platform.px}, aspect ratio ${platform.ratio}. Safe zones: ${platform.safe.en}.${flatPrint ? " Flat, front-facing printable artwork filling the canvas edge to edge — no mockup, no photo of the print, no desk, no perspective, no shadow." : ""}`,
     );
     sections.push(
       `Layout: ${fillStyle(style.layout.en, vars)}. This piece is ${output.essentials.en}. Information hierarchy: ${output.hierarchy.en}.${state.qrSlot ? " Leave an empty solid square for a QR code at bottom-right inside the safe margin (no fake QR pattern)." : ""}`,
     );
-    sections.push(`Typography: ${style.type.en}. Strong text/background contrast.`);
+    sections.push(`Typography: ${fillStyle(style.type.en, vars)}. Strong text/background contrast.`);
     sections.push(`Color: ${fillStyle(style.palette.en, vars)}. (Brand color: ${color.en}; accent: ${color.accentEn} ${color.accent}.)`);
-    sections.push(`Texture & light: ${style.texture.en}.`);
+    sections.push(`Texture & light: ${fillStyle(style.texture.en, vars)}.`);
     const hero = scene
       ? state.sceneEn.trim() || scene
       : state.photoSlot
@@ -232,7 +247,7 @@ export function buildPrompt(state: BuilderState, lang: Lang, today: DayKey | nul
       `Text to render (only the quoted Korean, verbatim, each item exactly once — ${items.length} items total; do not render the role labels):\n${list}${titleAi ? `\nThe headline may be rewritten into a shorter, punchier Korean line (about 12 characters per line, max 2 lines) that clearly signals the ${topic || "course"} topic. Keep every other item exactly as written.` : "\nDo not change any of the text."} No text outside the list — any text on screens, papers or signs in the scene must be illegible or blank.`,
     );
     sections.push(`Production: ${platform.print ? "print-ready at 300 dpi, " : ""}a finished, professional design piece with crisp Korean type.`);
-    sections.push(`Avoid: ${ANTI_AI.en}${extraAvoid.length ? `, ${extraAvoid.map((a) => a.en).join(", ")}` : ""}.`);
+    sections.push(`Avoid: ${antiAi.en}${extraAvoid.length ? `, ${extraAvoid.map((a) => a.en).join(", ")}` : ""}.`);
   }
   sections.push(`AR ${platform.ratio}`);
   return sections.join("\n");

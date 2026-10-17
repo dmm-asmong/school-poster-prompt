@@ -194,6 +194,19 @@ export type Style = Option & {
   photo?: boolean;
   /** 인쇄용 정면 평면 작업물 */
   flat?: boolean;
+  /** 같은 스타일 안의 표현 방식 (첫 번째가 기본, 고르면 해당 문장만 바꿔요) */
+  variants?: StyleVariant[];
+};
+
+export type StyleVariant = {
+  id: string;
+  label: string;
+  emoji?: string;
+  hint?: string;
+  /** 바꿀 문장들 (없으면 스타일 기본 문장) */
+  overrides?: Partial<Pick<Style, "brief" | "type" | "layout" | "palette" | "texture" | "imagery" | "photo">>;
+  /** 이 표현 방식에 맞춘 금지 목록 (없으면 기본 목록) */
+  avoid?: Label;
 };
 
 export const STYLES: Style[] = [
@@ -277,6 +290,28 @@ export const STYLES: Style[] = [
     palette: { ko: "어둡고 채도 낮춘 배경 사진, 흰 글자, {B} 강조 박스, {A} 태그", en: "a dark, desaturated background photo; white type; {B} highlight box; {A} tag" },
     texture: { ko: "실제 사진, 얕은 심도, 약 50% 어둡게", en: "a real photo with shallow depth of field, darkened about 50%" },
     imagery: { ko: "어둡고 초점이 나간 실제 사진: {hero}", en: "a real photograph, darkened and out of focus: {hero}" },
+    variants: [
+      { id: "photo", label: "실사", emoji: "📷", hint: "어둡게 깐 사진" },
+      {
+        id: "illust",
+        label: "일러스트",
+        emoji: "🎨",
+        hint: "웹툰풍 캐릭터",
+        overrides: {
+          photo: false,
+          brief: { ko: "한국 테크 유튜버 썸네일 — 검정 배경 위 굵은 플랫 코믹·웹툰풍 일러스트, 최대 대비, 한눈에 꽂히는 에너지", en: "a punchy Korean tech-YouTuber thumbnail — a bold flat comic / webtoon-style illustration on black, maximum contrast and energy" },
+          type: { ko: "검은고딕·G마켓 산스 Bold 같은 아주 굵은 장체 한글 고딕을 거대하게, 줄마다 흰색·{B} 번갈아 쓰고 두꺼운 어두운 외곽선. 카피는 헤드라인 아래 기울어진 {B} 띠 위에 검정 굵은 글자로", en: "huge, extra-heavy condensed Korean gothic (in the style of Black Han Sans / Gmarket Sans Bold), lines alternating white and {B}, with a thick dark outline; the tagline in bold black type on a slanted {B} banner under the headline" },
+          layout: { ko: "헤드라인을 왼쪽 절반~3/5에 크게 3줄로 쌓고, 카피는 그 아래 살짝 기울어진 {B} 띠 안에. 오른쪽에는 크리에이터 캐릭터와 소품을 겹쳐 배치하고, 배경 전체에 {B} 대각선 스피드 스트로크가 화면 밖으로 뻗게", en: "the headline stacked in 3 huge lines across the left half to three-fifths, the tagline inside a slightly slanted {B} banner below it; the creator character and props overlap on the right; {B} diagonal speed strokes burst across the whole background and off the edges" },
+          palette: { ko: "거의 검정 배경, 흰색과 {B} 두 가지가 주인공, 검정 외곽선. 그 밖의 색은 아주 작게만", en: "a near-black background; {B} and white do all the work, with black outlines; any other color only in tiny touches" },
+          texture: { ko: "선명한 플랫 셀 채색, 두꺼운 검정 외곽선, {B} 하프톤 점과 대각선 스피드 스트로크. 그라데이션·3D 광택 없음", en: "crisp flat cel shading, thick black outlines, {B} halftone dots and diagonal speed strokes; no gradients or 3D gloss" },
+          imagery: { ko: "굵은 플랫 코믹·웹툰풍 일러스트: {hero}", en: "a bold flat comic / webtoon-style illustration: {hero}" },
+        },
+        avoid: {
+          ko: "네온 글로우, 렌즈 플레어, 빛나는 회로·AI 칩·뇌·로봇 같은 상투적 이미지, 홀로그램, 3D 렌더·플라스틱 광택 캐릭터, 글래스모피즘, 가짜 UI 글자·로렘 입숨, 알아볼 수 없거나 중복된 글자, 목록에 없는 추가 글자, 워터마크·로고",
+          en: "neon glow, lens flare, glowing circuits / AI chips / brains / robots clichés, holograms, 3D-rendered or plastic glossy characters, glassmorphism, fake UI gibberish or lorem ipsum, garbled or duplicated text, any extra text beyond the list, watermarks or logos",
+        },
+      },
+    ],
   },
   {
     id: "riso", label: "리소 진(zine)", emoji: "🖨️", hint: "개성·캠퍼스", en: "two-ink risograph zine", photo: true,
