@@ -211,7 +211,7 @@ export const EXAMPLES: Example[] = [
       info: {
         title: { mode: "omit" },
         subtitle: { mode: "exact", value: "어려운 IT를 오늘 바로 쓰는 기술로" },
-        instructor: { mode: "exact", value: "양OO 강사" },
+        instructor: { mode: "exact", value: "김OO 강사" },
         bio: { mode: "exact", value: "IT 교육 12년 · 기업·대학 출강 300회" },
         cta: { mode: "exact", value: "출강 문의 lecture@example.com" },
       },

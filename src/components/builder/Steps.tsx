@@ -91,7 +91,7 @@ const META: Record<InfoKey, { label: string; placeholder: string; note?: string 
   schedule: { label: "일정 · 기간", placeholder: "예: 11월 10일(화) 시작 · 매주 화 20:00 (4주)", note: "AI 예시 날짜는 가상이에요. 요일은 실제 달력 기준." },
   place: { label: "장소 · 플랫폼", placeholder: "예: Zoom 실시간 라이브 / 강남 OO교육센터" },
   price: { label: "수강료 · 혜택", placeholder: "예: 얼리버드 99,000원 (정가 149,000원)" },
-  instructor: { label: "강사명", placeholder: "예: 양OO 강사" },
+  instructor: { label: "강사명", placeholder: "예: 김OO 강사" },
   bio: { label: "강사 한 줄 소개", placeholder: "예: IT 교육 12년 · 기업·대학 출강 300회" },
   cta: { label: "신청 안내 (CTA)", placeholder: "예: 프로필 링크에서 신청 / bit.ly/내강의" },
 };
