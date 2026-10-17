@@ -9,6 +9,7 @@ import {
   type CopyBank,
 } from "@/data/copy";
 import { SCHOOL_LEVELS } from "@/data/options";
+import { findPreset } from "@/data/presets";
 import { sampleDate, type DayKey } from "./dates";
 
 /** exact: 입력한 그대로 · ai: 앱이 추천한 예시(이미지 AI가 다듬어도 됨) · omit: 넣지 않기 */
@@ -109,7 +110,12 @@ export function resolveInfo(ctx: InfoContext, today: DayKey | null): Record<Info
     who: WHO_BY_SCHOOL[ctx.school] ?? "우리",
     audience: audience?.id === "all" && preschool ? "전체 원아" : (audience?.ko ?? "전교생"),
   };
-  vars.event = ctx.eventName.trim() || fill(bank.name[preschool ? 1 : 0], vars);
+  // '체육대회'처럼 행사 종류만 적었으면 연도가 들어간 기본 이름으로 풀어 씁니다.
+  const typedName = ctx.eventName.trim();
+  const preset = findPreset(ctx.presetId);
+  const compact = typedName.replace(/\s+/g, "");
+  const bareType = !!preset && (compact === preset.ko.replace(/\s+/g, "") || preset.keywords.includes(compact));
+  vars.event = typedName && !bareType ? typedName : fill(bank.name[preschool ? 1 : 0], vars);
 
   const suggestions: Record<InfoKey, string> = {
     title: fill(pick(blend(bank.titles, moodCopy.titles), seeds.title), vars),
