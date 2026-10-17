@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import type { ExampleImage } from "@/data/exampleImages";
 import { REVISIONS } from "@/data/revisions";
 import type { Lang } from "@/lib/builder";
 import CopyButton from "./CopyButton";
@@ -10,9 +12,11 @@ type Props = {
   onLangChange: (lang: Lang) => void;
   revisions: string[];
   onToggleRevision: (id: string) => void;
+  /** 갤러리에서 불러온 예시의 생성 이미지 */
+  preview?: { title: string; image: ExampleImage } | null;
 };
 
-export default function PromptPanel({ prompt, lang, onLangChange, revisions, onToggleRevision }: Props) {
+export default function PromptPanel({ prompt, lang, onLangChange, revisions, onToggleRevision, preview }: Props) {
   return (
     <div className="space-y-4 rounded-3xl border border-indigo-100 bg-white p-5 shadow-lg shadow-indigo-100/50 sm:p-6">
       <div className="flex items-center justify-between gap-3">
@@ -44,6 +48,23 @@ export default function PromptPanel({ prompt, lang, onLangChange, revisions, onT
         <p className="text-xs text-slate-500">
           프리셋·칩으로 고른 내용은 영어로 바뀌고, 직접 입력한 문장과 행사명은 그대로 들어가요.
         </p>
+      )}
+
+      {preview && (
+        <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-2.5 ring-1 ring-slate-100">
+          <Image
+            src={preview.image.src}
+            alt={`${preview.title} AI 생성 예시 이미지`}
+            width={preview.image.width}
+            height={preview.image.height}
+            sizes="72px"
+            className="size-16 shrink-0 rounded-xl object-cover"
+          />
+          <p className="text-xs leading-relaxed text-slate-500">
+            <b className="block text-slate-700">불러온 예시: {preview.title}</b>
+            원래 예시 프롬프트로 만든 AI 이미지예요. 고친 내용과 이미지 AI에 따라 결과는 달라져요.
+          </p>
+        </div>
       )}
 
       <div className="flex flex-col gap-2 sm:flex-row">

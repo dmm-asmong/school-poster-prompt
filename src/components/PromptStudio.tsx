@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { EXAMPLE_IMAGES } from "@/data/exampleImages";
 import type { Example } from "@/data/examples";
 import { findPreset, matchPreset } from "@/data/presets";
 import {
@@ -25,6 +26,8 @@ export default function PromptStudio() {
   const [lang, setLang] = useState<Lang>("ko");
   /** 사용자가 프리셋을 직접 고르면 행사명 자동 추천을 멈춥니다. */
   const [presetPinned, setPresetPinned] = useState(false);
+  /** 갤러리에서 불러온 예시 (결과 미리보기 이미지용) */
+  const [loadedExample, setLoadedExample] = useState<Example | null>(null);
 
   const today = useToday();
   const prompt = buildPrompt(state, lang, today);
@@ -68,11 +71,13 @@ export default function PromptStudio() {
   const onReset = () => {
     setState(DEFAULT_STATE);
     setPresetPinned(false);
+    setLoadedExample(null);
   };
 
   const onStartExample = (example: Example) => {
     setState(stateFromExample(example.state));
     setPresetPinned(Boolean(example.state.presetId));
+    setLoadedExample(example);
     document.getElementById("builder")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
@@ -103,6 +108,11 @@ export default function PromptStudio() {
               onLangChange={setLang}
               revisions={state.revisions}
               onToggleRevision={onToggleRevision}
+              preview={
+                loadedExample && EXAMPLE_IMAGES[loadedExample.id]
+                  ? { title: loadedExample.title, image: EXAMPLE_IMAGES[loadedExample.id] }
+                  : null
+              }
             />
           </div>
         </div>

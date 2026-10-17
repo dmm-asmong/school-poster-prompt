@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 예시 이미지 원본 (최적화된 webp만 public/examples 에 올립니다)
+/raw-examples/
