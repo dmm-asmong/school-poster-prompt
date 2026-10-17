@@ -7,6 +7,8 @@ import {
   OUTPUT_TYPES,
   PLATFORMS,
   STYLES,
+  byId,
+  resolveStyle,
   type OutputId,
 } from "@/data/options";
 import { INFO_KEYS, type BuilderState, type InfoKey, type InfoMode } from "@/lib/state";
@@ -88,6 +90,7 @@ export function RatioIcon({ ratio, on, size = 22 }: { ratio: string; on?: boolea
 const META: Record<InfoKey, { label: string; placeholder: string; note?: string }> = {
   title: { label: "강의 제목", placeholder: "예: 코딩 몰라도 OK, 4주 완성 파이썬", note: "AI 예시를 고르면 프롬프트가 더 눈에 띄는 제목으로 다듬게 해요." },
   subtitle: { label: "한 줄 카피", placeholder: "예: 퇴근 후 2시간, 반복 업무를 자동화하세요" },
+  badge: { label: "포인트 문구 (배지·큰 숫자)", placeholder: "예: 얼리버드 99,000원 / 12주 / AI 툴 5개", note: "스타일에 따라 도장·태그·큰 숫자·제호로 들어가요." },
   schedule: { label: "일정 · 기간", placeholder: "예: 11월 10일(화) 시작 · 매주 화 20:00 (4주)", note: "AI 예시 날짜는 가상이에요. 요일은 실제 달력 기준." },
   place: { label: "장소 · 플랫폼", placeholder: "예: Zoom 실시간 라이브 / 강남 OO교육센터" },
   price: { label: "수강료 · 혜택", placeholder: "예: 얼리버드 99,000원 (정가 149,000원)" },
@@ -107,7 +110,7 @@ type LectureProps = Common & {
 export function StepLecture({ state, onPatch, resolved, onMode, onValue, onShuffle, onCurriculum }: LectureProps) {
   const cert = state.output === "certificate";
   const labels: Partial<Record<InfoKey, string>> = cert
-    ? { title: "과정명", schedule: "수료일", instructor: "강사 서명" }
+    ? { title: "과정명", subtitle: "수여 문구", schedule: "수료일", instructor: "강사 서명" }
     : state.output === "seminar"
       ? { instructor: "연사(강사)명" }
       : {};
@@ -200,6 +203,7 @@ export function StepLecture({ state, onPatch, resolved, onMode, onValue, onShuff
 
 export function StepDesign({ state, onPatch }: Common) {
   const custom = !BRAND_COLORS.some((c) => c.id === state.color);
+  const auto = resolveStyle(null, state.output, Boolean(byId(PLATFORMS, state.platform)?.print));
   const toggleAvoid = (id: string) =>
     onPatch({ avoid: state.avoid.includes(id) ? state.avoid.filter((a) => a !== id) : [...state.avoid, id] });
   return (
@@ -207,8 +211,21 @@ export function StepDesign({ state, onPatch }: Common) {
       <Field label="분위기" hint="다시 누르면 해제">
         <Chips ariaLabel="분위기" allowDeselect options={MOODS} value={state.mood} onChange={(mood) => onPatch({ mood })} />
       </Field>
-      <Field label="디자인 스타일" hint="다시 누르면 해제">
+      <Field label="디자인 스타일" hint={state.style ? "다시 누르면 자동 추천으로" : `자동 추천: ${auto.label}`}>
         <Chips ariaLabel="디자인 스타일" allowDeselect options={STYLES} value={state.style} onChange={(style) => onPatch({ style })} />
+        <p className="mt-2 text-xs text-zinc-500">
+          스타일마다 서체·구도·색 쓰는 법·질감이 달라요.
+          {state.output === "certificate" && " 수료증은 어떤 스타일이든 바로 인쇄할 수 있는 정면 평면 원고로 만들어요."}
+        </p>
+      </Field>
+      <Field label="메인 장면 · 비주얼" htmlFor="scene" hint="비우면 주제·스타일에 맞춰 자동">
+        <input
+          id="scene"
+          value={state.scene}
+          onChange={(e) => onPatch({ scene: e.target.value, sceneEn: "" })}
+          placeholder="예: 저녁 창가에서 노트북으로 코딩하는 직장인의 뒷모습"
+          className={inputClass}
+        />
       </Field>
       <Field label="브랜드 컬러">
         <div role="radiogroup" aria-label="브랜드 컬러" className="flex flex-wrap items-center gap-2">
@@ -246,6 +263,9 @@ export function StepDesign({ state, onPatch }: Common) {
           label="강사 사진 합성 자리 남기기"
           desc="실제 프로필 사진을 나중에 얹을 빈 실루엣 영역"
         />
+        {state.output === "cardnews" && (
+          <Toggle checked={state.swipeCue} onChange={(swipeCue) => onPatch({ swipeCue })} label="스와이프 신호 넣기" desc="오른쪽 아래 작은 '넘겨 보기 →'" />
+        )}
         <Toggle checked={state.qrSlot} onChange={(qrSlot) => onPatch({ qrSlot })} label="QR 코드 빈칸 남기기" desc="신청 링크 QR을 직접 붙일 정사각형 자리" />
       </div>
       <Field label="피할 것">

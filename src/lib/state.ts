@@ -5,10 +5,10 @@ export type Lang = "ko" | "en";
 /** exact: 입력한 그대로 · ai: 앱이 만든 예시 문구(이미지 AI가 다듬어도 됨) · omit: 넣지 않기 */
 export type InfoMode = "exact" | "ai" | "omit";
 export type InfoField = { mode: InfoMode; value: string };
-export type InfoKey = "title" | "subtitle" | "schedule" | "place" | "price" | "instructor" | "bio" | "cta";
+export type InfoKey = "title" | "subtitle" | "badge" | "schedule" | "place" | "price" | "instructor" | "bio" | "cta";
 export type SeedKey = InfoKey | "curriculum" | "caption";
 
-export const INFO_KEYS: InfoKey[] = ["title", "subtitle", "schedule", "place", "price", "instructor", "bio", "cta"];
+export const INFO_KEYS: InfoKey[] = ["title", "subtitle", "badge", "schedule", "place", "price", "instructor", "bio", "cta"];
 
 export type BuilderState = {
   /** 강의 주제 (주제별 문구·비주얼을 고르는 기준) */
@@ -18,7 +18,14 @@ export type BuilderState = {
   audience: string;
   format: string;
   mood: string | null;
+  /** null 이면 홍보물 종류에 맞는 기본 스타일 */
   style: string | null;
+  /** 메인 장면을 직접 적을 때 (비우면 주제에 맞춰 자동) */
+  scene: string;
+  /** 갤러리 예시용 영어 장면 설명 (사용자가 장면을 고치면 비워요) */
+  sceneEn: string;
+  /** 카드뉴스 스와이프 신호 넣기 */
+  swipeCue: boolean;
   /** 팔레트 id 또는 직접 고른 #RRGGBB */
   color: string;
   info: Record<InfoKey, InfoField>;
@@ -36,6 +43,7 @@ const field = (mode: InfoMode, value = ""): InfoField => ({ mode, value });
 export const DEFAULT_INFO: Record<InfoKey, InfoField> = {
   title: field("ai"),
   subtitle: field("ai"),
+  badge: field("omit"),
   schedule: field("ai"),
   place: field("ai"),
   price: field("ai"),
@@ -47,6 +55,7 @@ export const DEFAULT_INFO: Record<InfoKey, InfoField> = {
 export const DEFAULT_SEEDS: Record<SeedKey, number> = {
   title: 0,
   subtitle: 0,
+  badge: 0,
   schedule: 0,
   place: 0,
   price: 0,
@@ -64,7 +73,10 @@ export const DEFAULT_STATE: BuilderState = {
   audience: "worker",
   format: "live",
   mood: "trust",
-  style: "swiss",
+  style: null,
+  scene: "",
+  sceneEn: "",
+  swipeCue: true,
   color: "teal",
   info: DEFAULT_INFO,
   curriculum: { mode: "ai", items: ["", "", "", ""] },

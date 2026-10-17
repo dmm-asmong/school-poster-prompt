@@ -58,6 +58,17 @@ const SUBTITLES: Record<string, string[]> = {
   creator: ["혼자서도 전문가처럼, 시간은 절반으로", "내 브랜드를 키우는 실전 도구"],
 };
 
+const BADGES: Record<string, string[]> = {
+  recruit: ["얼리버드 혜택", "선착순 20명", "1기 모집"],
+  seminar: ["무료 특강", "선착순 100명"],
+  cardnews: ["저장 필수", "총정리"],
+  thumbnail: ["10분 정리", "총정리"],
+  certificate: ["우수 수료"],
+  profile: ["출강 300회"],
+};
+
+const CERT_STATEMENT = "위 사람은 본 과정을 성실히 이수하였기에 이 증서를 수여합니다.";
+
 const CTAS: Record<string, string[]> = {
   feed: ["프로필 링크에서 신청하기", "지금 신청하면 얼리버드 혜택"],
   story: ["위로 밀어서 신청하기", "링크 스티커 눌러 신청"],
@@ -168,7 +179,9 @@ export function resolveInfo(state: BuilderState, today: DayKey | null): Resolved
   const titleText = state.info.title.mode === "omit" ? "" : own("title") || titleSugg;
   const sugg: Record<InfoKey, string> = {
     title: titleSugg || pickDistinct(FALLBACK_TITLES[state.output] ?? FALLBACK_TITLES.recruit, s.title, own("subtitle")),
-    subtitle: pickDistinct(SUBTITLES[state.audience] ?? SUBTITLES.worker, s.subtitle, titleText),
+    subtitle:
+      state.output === "certificate" ? CERT_STATEMENT : pickDistinct(SUBTITLES[state.audience] ?? SUBTITLES.worker, s.subtitle, titleText),
+    badge: pick(BADGES[state.output] ?? BADGES.recruit, s.badge),
     schedule: scheduleIdeas(state, today, s.schedule),
     place: pick(placeIdeas(state), s.place),
     price: pick(priceIdeas(state), s.price),
