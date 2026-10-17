@@ -1,4 +1,4 @@
-import type { BuilderState } from "@/lib/builder";
+import type { ExampleState } from "@/lib/builder";
 
 export const EXAMPLE_CATEGORIES = ["학교 행사", "캠페인·교육", "학부모·안내", "교실·수업", "유아"] as const;
 export type ExampleCategory = (typeof EXAMPLE_CATEGORIES)[number];
@@ -14,7 +14,7 @@ export type Example = {
   bad: string;
   tip: string;
   /** 빌더에 불러올 값. presetId 가 있으면 비어 있는 장면·요소는 프리셋으로 채웁니다. */
-  state: Partial<BuilderState>;
+  state: ExampleState;
 };
 
 const G = {
@@ -46,7 +46,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.sky,
     bad: "운동회 현수막",
     tip: "현수막은 21:9처럼 아주 가로로 길게. 글자 자리를 왼쪽에 비워 두면 편집하기 쉬워요.",
-    state: { eventName: "푸른꿈 한마음 운동회", presetId: "sports", school: "elementary", purpose: "banner", ratio: "21:9", style: "flat", textSpace: "left" },
+    state: { eventName: "푸른꿈 한마음 운동회", presetId: "sports", school: "elementary", purpose: "banner", ratio: "21:9", style: "flat", textSpace: "left", info: { time: { mode: "omit" }, host: { mode: "ai" } } },
   },
   {
     id: "entrance-watercolor",
@@ -66,7 +66,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.grape,
     bad: "졸업 축하 이미지",
     tip: "실사 느낌을 원하면 '먼 거리에서'처럼 카메라 거리를 정해 얼굴이 드러나지 않게 해요.",
-    state: { eventName: "2027 졸업식", presetId: "graduation", school: "high", audience: "seniors", style: "film", mood: "moving" },
+    state: { eventName: "2027 졸업식", presetId: "graduation", school: "high", audience: "seniors", style: "film", mood: "moving", info: { title: { mode: "ai" }, date: { mode: "exact", value: "2027년 2월 12일(금)" }, time: { mode: "exact", value: "오전 10시" }, place: { mode: "exact", value: "본교 강당" }, host: { mode: "exact", value: "한별고등학교" } } },
   },
   {
     id: "festival-y2k",
@@ -86,7 +86,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.pink,
     bad: "축제 인스타 사진",
     tip: "SNS는 1:1이나 4:5. 작은 화면에서 보이도록 요소를 3~4개로 줄여요.",
-    state: { eventName: "가을 한마당", presetId: "festival", school: "middle", purpose: "sns", ratio: "1:1", style: "sticker", elements: "풍선, 가랜드, 공연 무대 조명" },
+    state: { eventName: "가을 한마당", presetId: "festival", school: "middle", purpose: "sns", ratio: "1:1", style: "sticker", elements: "풍선, 가랜드, 공연 무대 조명", info: { contact: { mode: "ai" } } },
   },
   {
     id: "arts-curtain",
@@ -106,7 +106,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.mint,
     bad: "소풍 그림",
     tip: "아이소메트릭은 버스·숲·목적지를 한 화면에 지도처럼 담기 좋아요.",
-    state: { eventName: "숲속 현장체험학습", presetId: "fieldtrip", school: "elementary", audience: "lower", style: "isometric" },
+    state: { eventName: "숲속 현장체험학습", presetId: "fieldtrip", school: "elementary", audience: "lower", style: "isometric", info: { contact: { mode: "ai" } } },
   },
   {
     id: "concert-neon",
@@ -116,7 +116,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.indigo,
     bad: "밴드 공연 포스터 멋있게",
     tip: "프리셋에 없는 행사라도 장면과 요소를 직접 쓰면 돼요. 네온사인 글자는 밤 공연에 잘 어울려요.",
-    state: { eventName: "밴드부 정기공연 ECHO", presetId: "arts", school: "high", style: "neonsign", mood: "dynamic", scene: "어두운 강당 무대에서 기타와 드럼을 연주하는 밴드의 실루엣 뒤로 조명이 쏟아지는 장면", elements: "일렉 기타, 드럼, 무대 조명, 음표" },
+    state: { eventName: "밴드부 정기공연 ECHO", presetId: "arts", school: "high", style: "neonsign", mood: "dynamic", scene: "어두운 강당 무대에서 기타와 드럼을 연주하는 밴드의 실루엣 뒤로 조명이 쏟아지는 장면", elements: "일렉 기타, 드럼, 무대 조명, 음표", info: { title: { mode: "exact", value: "밴드부 정기공연 ECHO" }, date: { mode: "exact", value: "2026년 12월 18일(금)" }, time: { mode: "exact", value: "오후 6시 30분" }, place: { mode: "exact", value: "본교 대강당" } } },
   },
 
   // ── 캠페인·교육 ────────────────────────────
@@ -128,7 +128,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.mint,
     bad: "환경 보호 포스터",
     tip: "캠페인 포스터는 구호를 짧게 한 줄로. 페이퍼 컷은 입체감이 있어 게시판에서도 눈에 띄어요.",
-    state: { eventName: "지구를 지키는 우리 반", presetId: "eco", school: "elementary", style: "papercut" },
+    state: { eventName: "지구를 지키는 우리 반", presetId: "eco", school: "elementary", style: "papercut", info: { time: { mode: "omit" } } },
   },
   {
     id: "eco-plastic",
@@ -138,7 +138,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.sky,
     bad: "플라스틱 줄이자",
     tip: "하지 말라는 장면(쓰레기 더미)보다 바람직한 행동(텀블러 쓰기)을 그리면 메시지가 밝아져요.",
-    state: { eventName: "플라스틱 다이어트 주간", presetId: "eco", school: "middle", style: "claymorph", scene: "학생들이 텀블러와 장바구니를 들고 웃으며 매점 앞에 줄 서 있는 장면", elements: "텀블러, 장바구니, 분리수거함, 새싹" },
+    state: { eventName: "플라스틱 다이어트 주간", presetId: "eco", school: "middle", style: "claymorph", scene: "학생들이 텀블러와 장바구니를 들고 웃으며 매점 앞에 줄 서 있는 장면", elements: "텀블러, 장바구니, 분리수거함, 새싹", info: { time: { mode: "omit" }, contact: { mode: "ai" } } },
   },
   {
     id: "antibully-umbrella",
@@ -148,7 +148,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.pink,
     bad: "학교폭력 하지 마",
     tip: "학교폭력 예방물은 피해 장면 대신 함께하는 모습으로. '피할 것'에 폭력적인 표현을 넣어 두세요.",
-    state: { eventName: "우리는 한 우산 친구", presetId: "antibully", school: "elementary", style: "crayon", avoid: "폭력적인 표현, 실제 학생 얼굴" },
+    state: { eventName: "우리는 한 우산 친구", presetId: "antibully", school: "elementary", style: "crayon", avoid: "폭력적인 표현, 실제 학생 얼굴", info: { time: { mode: "omit" }, contact: { mode: "ai" } } },
   },
   {
     id: "antibully-webtoon",
@@ -158,7 +158,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.indigo,
     bad: "사이버폭력 예방 그림",
     tip: "중·고등학생에게는 웹툰 컷이 친숙해요. 말풍선은 비워 두고 글은 나중에 넣는 게 정확해요.",
-    state: { eventName: "말 한마디 캠페인", presetId: "antibully", school: "middle", style: "webtoon", scene: "휴대폰을 든 친구에게 다른 친구가 다가가 따뜻한 메시지를 보여 주는 웹툰 한 컷", elements: "휴대폰, 빈 말풍선, 하트" },
+    state: { eventName: "말 한마디 캠페인", presetId: "antibully", school: "middle", style: "webtoon", scene: "휴대폰을 든 친구에게 다른 친구가 다가가 따뜻한 메시지를 보여 주는 웹툰 한 컷", elements: "휴대폰, 빈 말풍선, 하트", info: { date: { mode: "omit" }, time: { mode: "omit" }, place: { mode: "omit" } } },
   },
   {
     id: "ai-claymorph",
@@ -198,7 +198,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.sun,
     bad: "독서 포스터 전통 느낌",
     tip: "'전통 느낌'은 민화·수묵화처럼 구체적인 화풍으로 바꿔 쓰세요.",
-    state: { eventName: "9월 독서의 달", presetId: "reading", school: "high", style: "minhwa", mood: "calm" },
+    state: { eventName: "9월 독서의 달", presetId: "reading", school: "high", style: "minhwa", mood: "calm", info: { time: { mode: "omit" } } },
   },
   {
     id: "safety-pictogram",
@@ -240,7 +240,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.sky,
     bad: "학부모 공개수업 안내 이미지",
     tip: "학부모 대상은 차분하고 신뢰감 있는 분위기로. 일시·장소 자리를 비워 두세요.",
-    state: { eventName: "2학기 학부모 공개수업", presetId: "openclass", school: "elementary", audience: "parents", purpose: "newsletter", ratio: "a4", style: "watercolor", textSpace: "bottom" },
+    state: { eventName: "2학기 학부모 공개수업", presetId: "openclass", school: "elementary", audience: "parents", purpose: "newsletter", ratio: "a4", style: "watercolor", textSpace: "bottom", info: { title: { mode: "exact", value: "2학기 학부모 공개수업" }, subtitle: { mode: "exact", value: "우리 아이들의 배움을 함께 지켜봐 주세요" }, date: { mode: "exact", value: "2026년 11월 4일(수)" }, time: { mode: "exact", value: "2교시 (오전 9시 50분 ~ 10시 30분)" }, place: { mode: "exact", value: "각 학급 교실" }, contact: { mode: "exact", value: "참관 신청: 10월 28일까지 회신서 제출" } } },
   },
   {
     id: "newsletter-autumn",
@@ -260,7 +260,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.pink,
     bad: "방과후 모집 포스터",
     tip: "모집 안내는 프로그램을 아이콘처럼 정리하면 한눈에 들어와요.",
-    state: { eventName: "2027 봄 방과후학교 모집", presetId: "afterschool", school: "elementary", audience: "parents", style: "icons" },
+    state: { eventName: "2027 봄 방과후학교 모집", presetId: "afterschool", school: "elementary", audience: "parents", style: "icons", info: { date: { mode: "exact", value: "2027년 2월 15일(월) ~ 2월 19일(금)" }, time: { mode: "omit" }, place: { mode: "exact", value: "학교 누리집 온라인 신청" }, contact: { mode: "ai" } } },
   },
   {
     id: "staff-training",
@@ -270,7 +270,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.indigo,
     bad: "연수 표지",
     tip: "발표 자료 표지는 16:9, 스위스 그리드처럼 단정한 화풍이 무난해요.",
-    state: { eventName: "생성형 AI 활용 교직원 연수", presetId: "digital", school: "middle", audience: "staff", purpose: "slides", ratio: "16:9", style: "swiss", mood: "formal", scene: "노트북을 펼친 회의 탁자 위로 AI 아이콘과 수업 자료가 떠오르는 깔끔한 장면" },
+    state: { eventName: "생성형 AI 활용 교직원 연수", presetId: "digital", school: "middle", audience: "staff", purpose: "slides", ratio: "16:9", style: "swiss", mood: "formal", scene: "노트북을 펼친 회의 탁자 위로 AI 아이콘과 수업 자료가 떠오르는 깔끔한 장면", info: { title: { mode: "exact", value: "생성형 AI 활용 교직원 연수" }, subtitle: { mode: "ai" }, date: { mode: "exact", value: "2026년 11월 19일(목)" }, time: { mode: "exact", value: "오후 3시 ~ 5시" }, place: { mode: "exact", value: "본교 시청각실" }, host: { mode: "omit" } } },
   },
   {
     id: "notice-safety",
@@ -290,7 +290,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.grape,
     bad: "음악회 홍보",
     tip: "지역 주민 대상이면 학교 건물과 동네 풍경을 함께 넣어 친근함을 살려요.",
-    state: { eventName: "마을과 함께하는 작은 음악회", presetId: "arts", school: "high", audience: "community", style: "impression", mood: "warm", scene: "노을 지는 학교 운동장 야외 무대에서 학생 오케스트라가 연주하고 동네 주민들이 돗자리에 앉아 듣는 장면" },
+    state: { eventName: "마을과 함께하는 작은 음악회", presetId: "arts", school: "high", audience: "community", style: "impression", mood: "warm", scene: "노을 지는 학교 운동장 야외 무대에서 학생 오케스트라가 연주하고 동네 주민들이 돗자리에 앉아 듣는 장면", info: { host: { mode: "ai" }, contact: { mode: "ai" } } },
   },
 
   // ── 교실·수업 ──────────────────────────────
@@ -302,7 +302,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.pink,
     bad: "교실 게시판 꾸미기",
     tip: "게시판용은 3:4로 만들고 인쇄 후 잘라 붙일 수 있게 배경을 단순하게 요청해요.",
-    state: { eventName: "우리 반에 온 걸 환영해", presetId: "entrance", school: "elementary", purpose: "board", ratio: "3:4", style: "felt", mood: "cute" },
+    state: { eventName: "우리 반에 온 걸 환영해", presetId: "entrance", school: "elementary", purpose: "board", ratio: "3:4", style: "felt", mood: "cute", info: { date: { mode: "omit" }, time: { mode: "omit" }, place: { mode: "omit" } } },
   },
   {
     id: "board-rules",
@@ -312,7 +312,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.mint,
     bad: "교실 규칙 포스터",
     tip: "글이 많은 포스터는 그림만 AI로 만들고 약속 문구는 직접 넣는 게 정확해요.",
-    state: { eventName: "우리 반 약속", school: "elementary", audience: "grade", purpose: "board", ratio: "3:4", style: "doodle", mood: "cute", textSpace: "top", scene: "교실 칠판 앞에서 동물 친구들이 손을 들고 차례를 기다리는 장면", elements: "칠판, 동물 친구들, 별 스티커", avoid: "알아볼 수 없는 글자" },
+    state: { eventName: "우리 반 약속", school: "elementary", audience: "grade", purpose: "board", ratio: "3:4", style: "doodle", mood: "cute", textSpace: "top", scene: "교실 칠판 앞에서 동물 친구들이 손을 들고 차례를 기다리는 장면", elements: "칠판, 동물 친구들, 별 스티커", avoid: "알아볼 수 없는 글자", info: { title: { mode: "exact", value: "우리 반 약속" }, subtitle: { mode: "ai" }, date: { mode: "omit" }, time: { mode: "omit" }, place: { mode: "omit" } } },
   },
   {
     id: "slides-history",
@@ -322,7 +322,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.sun,
     bad: "조선시대 ppt 표지",
     tip: "수업 표지는 16:9에 좌측 여백을 두면 제목을 얹기 좋아요.",
-    state: { eventName: "조선의 과학 기술", school: "middle", audience: "grade", purpose: "slides", ratio: "16:9", style: "ink", mood: "calm", textSpace: "left", scene: "해시계와 측우기, 거중기가 놓인 조선 궁궐 마당을 수묵 담채로 그린 풍경", elements: "해시계, 측우기, 거중기, 기와지붕" },
+    state: { eventName: "조선의 과학 기술", school: "middle", audience: "grade", purpose: "slides", ratio: "16:9", style: "ink", mood: "calm", textSpace: "left", scene: "해시계와 측우기, 거중기가 놓인 조선 궁궐 마당을 수묵 담채로 그린 풍경", elements: "해시계, 측우기, 거중기, 기와지붕", info: { title: { mode: "exact", value: "조선의 과학 기술" }, subtitle: { mode: "exact", value: "세종 시대의 발명품 탐구" }, date: { mode: "omit" }, time: { mode: "omit" }, place: { mode: "omit" } } },
   },
   {
     id: "slides-math",
@@ -332,7 +332,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.indigo,
     bad: "수학 발표 배경",
     tip: "기하학 도형 화풍은 수학 수업과 잘 맞고 글자가 없어도 주제가 전해져요.",
-    state: { eventName: "생활 속 대칭 찾기", school: "high", audience: "grade", purpose: "slides", ratio: "16:9", style: "geometric", mood: "curious", textSpace: "left", scene: "나비, 눈꽃, 건물 창문 속 대칭 무늬가 도형으로 정리되어 떠 있는 장면", avoid: "영어 문구" },
+    state: { eventName: "생활 속 대칭 찾기", school: "high", audience: "grade", purpose: "slides", ratio: "16:9", style: "geometric", mood: "curious", textSpace: "left", scene: "나비, 눈꽃, 건물 창문 속 대칭 무늬가 도형으로 정리되어 떠 있는 장면", avoid: "영어 문구", info: { title: { mode: "exact", value: "생활 속 대칭 찾기" }, subtitle: { mode: "omit" }, date: { mode: "omit" }, time: { mode: "omit" }, place: { mode: "omit" } } },
   },
   {
     id: "classroom-story",
@@ -342,7 +342,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.grape,
     bad: "반 단톡방 공지 이미지",
     tip: "9:16 세로 이미지는 위아래 여백을 넉넉히 두면 휴대폰 화면에서 잘려도 괜찮아요.",
-    state: { eventName: "2반 마니또 주간", presetId: "antibully", school: "middle", audience: "grade", purpose: "story", ratio: "9:16", style: "chibi", mood: "cute", scene: "선물 상자를 몰래 사물함에 넣는 귀여운 SD 캐릭터와 비밀 쪽지", elements: "선물 상자, 사물함, 비밀 쪽지, 하트" },
+    state: { eventName: "2반 마니또 주간", presetId: "antibully", school: "middle", audience: "grade", purpose: "story", ratio: "9:16", style: "chibi", mood: "cute", scene: "선물 상자를 몰래 사물함에 넣는 귀여운 SD 캐릭터와 비밀 쪽지", elements: "선물 상자, 사물함, 비밀 쪽지, 하트", info: { title: { mode: "exact", value: "2반 마니또 주간" }, time: { mode: "omit" }, place: { mode: "omit" } } },
   },
   {
     id: "chalk-exam",
@@ -352,7 +352,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.mint,
     bad: "시험 화이팅 그림",
     tip: "칠판 분필 화풍은 교실 느낌을 살리면서 글자 연출에도 강해요.",
-    state: { eventName: "기말고사 모두 힘내자", school: "high", audience: "grade", purpose: "sns", ratio: "4:5", style: "chalk", mood: "warm", textSpace: "top", scene: "초록 칠판 위에 연필, 별, 응원 하트가 분필로 그려진 장면", elements: "연필, 별, 하트, 분필" },
+    state: { eventName: "기말고사 모두 힘내자", school: "high", audience: "grade", purpose: "sns", ratio: "4:5", style: "chalk", mood: "warm", textSpace: "top", scene: "초록 칠판 위에 연필, 별, 응원 하트가 분필로 그려진 장면", elements: "연필, 별, 하트, 분필", info: { title: { mode: "exact", value: "기말고사 모두 힘내자" }, subtitle: { mode: "ai" }, date: { mode: "omit" }, time: { mode: "omit" }, place: { mode: "omit" } } },
   },
 
   // ── 유아 ──────────────────────────────────
@@ -364,7 +364,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.sun,
     bad: "유치원 운동회",
     tip: "유아 대상은 동물 캐릭터로 바꾸면 귀엽고 초상권 걱정도 없어요.",
-    state: { eventName: "햇살반 꼬마 운동회", presetId: "sports", school: "kinder", style: "felt", mood: "cute", scene: "병아리와 토끼 친구들이 박 터뜨리기와 공 굴리기를 하는 작은 운동장" },
+    state: { eventName: "햇살반 꼬마 운동회", presetId: "sports", school: "kinder", style: "felt", mood: "cute", scene: "병아리와 토끼 친구들이 박 터뜨리기와 공 굴리기를 하는 작은 운동장", info: { host: { mode: "ai" } } },
   },
   {
     id: "kinder-graduation",
@@ -374,7 +374,7 @@ export const EXAMPLES: Example[] = [
     gradient: G.pink,
     bad: "유치원 졸업 사진",
     tip: "졸업 앨범 표지는 A4 세로에 그림책 화풍이 따뜻해요.",
-    state: { eventName: "무지개반 졸업을 축하해", presetId: "graduation", school: "kinder", audience: "seniors", purpose: "newsletter", ratio: "a4", style: "picturebook", scene: "작은 학사모를 쓴 아기 동물들이 무지개 다리를 건너는 장면" },
+    state: { eventName: "무지개반 졸업을 축하해", presetId: "graduation", school: "kinder", audience: "seniors", purpose: "newsletter", ratio: "a4", style: "picturebook", scene: "작은 학사모를 쓴 아기 동물들이 무지개 다리를 건너는 장면", info: { time: { mode: "omit" }, place: { mode: "omit" }, host: { mode: "ai" } } },
   },
   {
     id: "daycare-season",

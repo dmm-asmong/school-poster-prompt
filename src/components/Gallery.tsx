@@ -4,16 +4,17 @@ import { useMemo, useState } from "react";
 import { EXAMPLE_CATEGORIES, EXAMPLES, type Example, type ExampleCategory } from "@/data/examples";
 import { stateFromExample } from "@/lib/builder";
 import { buildPrompt } from "@/lib/prompt";
+import type { DayKey } from "@/lib/dates";
 import ExampleCard from "./ExampleCard";
 
-type Props = { onStart: (example: Example) => void };
+type Props = { onStart: (example: Example) => void; today: DayKey | null };
 
-export default function Gallery({ onStart }: Props) {
+export default function Gallery({ onStart, today }: Props) {
   const [category, setCategory] = useState<ExampleCategory | "전체">("전체");
 
   const prompts = useMemo(
-    () => new Map(EXAMPLES.map((ex) => [ex.id, buildPrompt(stateFromExample(ex.state), "ko")])),
-    [],
+    () => new Map(EXAMPLES.map((ex) => [ex.id, buildPrompt(stateFromExample(ex.state), "ko", today)])),
+    [today],
   );
   const list = category === "전체" ? EXAMPLES : EXAMPLES.filter((ex) => ex.category === category);
   const tabs: (ExampleCategory | "전체")[] = ["전체", ...EXAMPLE_CATEGORIES];

@@ -11,7 +11,9 @@ import {
   type BuilderState,
   type Lang,
 } from "@/lib/builder";
+import { resolveInfo, type InfoKey, type InfoMode } from "@/lib/posterInfo";
 import { buildPrompt } from "@/lib/prompt";
+import { useToday } from "@/lib/useToday";
 import BuilderForm from "./builder/BuilderForm";
 import Gallery from "./Gallery";
 import PromptPanel from "./PromptPanel";
@@ -24,7 +26,9 @@ export default function PromptStudio() {
   /** 사용자가 프리셋을 직접 고르면 행사명 자동 추천을 멈춥니다. */
   const [presetPinned, setPresetPinned] = useState(false);
 
-  const prompt = buildPrompt(state, lang);
+  const today = useToday();
+  const prompt = buildPrompt(state, lang, today);
+  const resolved = resolveInfo(state, today);
   const patch = (p: Partial<BuilderState>) => setState((s) => ({ ...s, ...p }));
 
   const onEventNameChange = (eventName: string) => {
@@ -48,6 +52,17 @@ export default function PromptStudio() {
     setState((s) => ({
       ...s,
       revisions: s.revisions.includes(id) ? s.revisions.filter((r) => r !== id) : [...s.revisions, id],
+    }));
+
+  const onInfoChange = (key: InfoKey, p: { mode?: InfoMode; value?: string }) =>
+    setState((s) => ({ ...s, info: { ...s.info, [key]: { ...s.info[key], ...p } } }));
+
+  /** '다른 문구': 추천 번호를 바꾸고 직접 고친 글자는 지웁니다. */
+  const onShuffle = (key: InfoKey) =>
+    setState((s) => ({
+      ...s,
+      seeds: { ...s.seeds, [key]: s.seeds[key] + 1 },
+      info: { ...s.info, [key]: { ...s.info[key], value: "" } },
     }));
 
   const onReset = () => {
@@ -77,6 +92,9 @@ export default function PromptStudio() {
             onPresetSelect={onPresetSelect}
             onPurposeChange={onPurposeChange}
             onReset={onReset}
+            resolved={resolved}
+            onInfoChange={onInfoChange}
+            onShuffle={onShuffle}
           />
           <div className="lg:sticky lg:top-20">
             <PromptPanel
@@ -97,7 +115,7 @@ export default function PromptStudio() {
             title="아쉬운 프롬프트 vs 좋은 프롬프트"
             desc="마음에 드는 예시를 눌러 빌더로 불러온 뒤, 우리 학교에 맞게 고쳐 쓰세요."
           />
-          <Gallery onStart={onStartExample} />
+          <Gallery onStart={onStartExample} today={today} />
         </div>
       </section>
     </>

@@ -11,8 +11,10 @@ import {
 } from "@/data/options";
 import { findPreset, presetElementsText } from "@/data/presets";
 import type { BuilderState } from "@/lib/builder";
+import type { InfoKey, InfoMode, ResolvedField } from "@/lib/posterInfo";
 import ChipGroup from "./ChipGroup";
 import Field from "./Field";
+import InfoSection from "./InfoSection";
 import PresetPicker from "./PresetPicker";
 import StylePicker from "./StylePicker";
 
@@ -23,6 +25,9 @@ type Props = {
   onPresetSelect: (id: string | null) => void;
   onPurposeChange: (id: string) => void;
   onReset: () => void;
+  resolved: Record<InfoKey, ResolvedField>;
+  onInfoChange: (key: InfoKey, patch: { mode?: InfoMode; value?: string }) => void;
+  onShuffle: (key: InfoKey) => void;
 };
 
 const inputClass =
@@ -85,6 +90,9 @@ export default function BuilderForm({
   onPresetSelect,
   onPurposeChange,
   onReset,
+  resolved,
+  onInfoChange,
+  onShuffle,
 }: Props) {
   const preset = findPreset(state.presetId);
 
@@ -106,6 +114,16 @@ export default function BuilderForm({
             placeholder="예: 2026 가을 전교 체육대회"
             maxLength={60}
           />
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
+            <input
+              type="checkbox"
+              checked={state.info.title.mode === "exact"}
+              onChange={(e) => onInfoChange("title", { mode: e.target.checked ? "exact" : "ai" })}
+              className="size-4 accent-pink-500"
+            />
+            입력한 타이틀 그대로 사용
+            <span className="text-xs text-slate-400">(끄면 더 눈에 띄는 제목을 추천해요)</span>
+          </label>
         </Field>
         <Field label="행사 프리셋" hint="탭하면 장면·요소 자동 제안">
           <PresetPicker value={state.presetId} onSelect={onPresetSelect} />
@@ -166,7 +184,11 @@ export default function BuilderForm({
         </Field>
       </Section>
 
-      <Section step={5} title="자세히 (선택)">
+      <Section step={5} title="포스터에 들어갈 정보">
+        <InfoSection state={state} resolved={resolved} onFieldChange={onInfoChange} onShuffle={onShuffle} />
+      </Section>
+
+      <Section step={6} title="자세히 (선택)">
         <Field label="주요 장면" htmlFor="scene" hint={preset && state.scene === preset.scene.ko ? undefined : "한 문장으로"}>
           <div className="space-y-1.5">
             <SuggestedBadge show={!!preset && state.scene === preset.scene.ko} />
@@ -210,7 +232,7 @@ export default function BuilderForm({
               className={inputClass}
               value={state.textGuide}
               onChange={(e) => onPatch({ textGuide: e.target.value })}
-              placeholder="예: 날짜·장소는 아래쪽에 작게"
+              placeholder="예: 제목은 둥근 손글씨 느낌으로"
             />
           </div>
         </Field>
@@ -235,13 +257,7 @@ export default function BuilderForm({
             ))}
           </div>
         </Field>
-        <div className="grid gap-2 sm:grid-cols-2">
-          <Toggle
-            checked={state.titleText}
-            onChange={(v) => onPatch({ titleText: v })}
-            label="행사명을 크게 한글로"
-            desc="글자를 정확히 쓰라는 요청을 넣어요"
-          />
+        <div>
           <Toggle
             checked={state.protectFaces}
             onChange={(v) => onPatch({ protectFaces: v })}

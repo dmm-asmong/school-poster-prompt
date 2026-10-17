@@ -1,5 +1,13 @@
 import { PURPOSES } from "@/data/options";
 import { findPreset, presetElementsText, type EventPreset } from "@/data/presets";
+import {
+  DEFAULT_INFO,
+  DEFAULT_SEEDS,
+  type InfoField,
+  type InfoKey,
+  type InfoSeeds,
+  type PosterInfo,
+} from "./posterInfo";
 
 export type Lang = "ko" | "en";
 
@@ -17,8 +25,10 @@ export type BuilderState = {
   textSpace: string | null;
   textGuide: string;
   avoid: string;
-  /** 행사명을 크게 한글로 정확히 쓰라는 문장을 넣을지 */
-  titleText: boolean;
+  /** 포스터에 들어갈 글자 정보 (제목·부제·일시·장소…) */
+  info: PosterInfo;
+  /** '다른 문구' 버튼으로 바뀌는 추천 번호 */
+  seeds: InfoSeeds;
   /** 얼굴이 식별되지 않게 (초상권 보호) */
   protectFaces: boolean;
   revisions: string[];
@@ -38,7 +48,8 @@ export const DEFAULT_STATE: BuilderState = {
   textSpace: "top",
   textGuide: "",
   avoid: "",
-  titleText: true,
+  info: DEFAULT_INFO,
+  seeds: DEFAULT_SEEDS,
   protectFaces: true,
   revisions: [],
 };
@@ -79,15 +90,25 @@ export function applyPreset(state: BuilderState, preset: EventPreset | undefined
   };
 }
 
+/** 갤러리 예시에 담는 값 (포스터 정보는 칸별로 일부만 적어도 됩니다) */
+export type ExampleState = Partial<Omit<BuilderState, "info">> & {
+  info?: Partial<Record<InfoKey, Partial<InfoField>>>;
+};
+
 /** 갤러리 예시를 빌더 상태로 바꿉니다. */
-export function stateFromExample(partial: Partial<BuilderState>): BuilderState {
-  const purpose = partial.purpose ?? DEFAULT_STATE.purpose;
-  const preset = findPreset(partial.presetId ?? null);
+export function stateFromExample(partial: ExampleState): BuilderState {
+  const { info: infoPatch, ...rest } = partial;
+  const purpose = rest.purpose ?? DEFAULT_STATE.purpose;
+  const preset = findPreset(rest.presetId ?? null);
+  const info = { ...DEFAULT_INFO };
+  for (const [key, field] of Object.entries(infoPatch ?? {}) as [InfoKey, Partial<InfoField>][]) {
+    info[key] = { ...DEFAULT_INFO[key], ...field };
+  }
   const base: BuilderState = {
     ...DEFAULT_STATE,
     purpose,
     ratio: defaultRatioFor(purpose),
     ...(preset ? { ...presetFields(preset), mood: preset.mood } : {}),
   };
-  return { ...base, ...partial, presetId: preset?.id ?? null };
+  return { ...base, ...rest, info, seeds: DEFAULT_SEEDS, presetId: preset?.id ?? null };
 }

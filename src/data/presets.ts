@@ -47,7 +47,7 @@ export const EVENT_PRESETS: EventPreset[] = [
       { ko: "환영 리본", en: "welcome ribbon" },
       { ko: "교문", en: "school gate" },
     ],
-    textGuide: { ko: "'입학을 축하합니다' 문구도 정확히", en: "also write '입학을 축하합니다' exactly" },
+    textGuide: { ko: "글자는 둥글고 친근한 서체로", en: "use a round, friendly typeface" },
     mood: "warm",
   },
   {
@@ -65,7 +65,7 @@ export const EVENT_PRESETS: EventPreset[] = [
       { ko: "졸업장 두루마리", en: "rolled diplomas" },
       { ko: "종이 꽃가루", en: "confetti" },
     ],
-    textGuide: { ko: "'졸업을 축하합니다' 문구도 정확히", en: "also write '졸업을 축하합니다' exactly" },
+    textGuide: { ko: "제목은 우아한 붓글씨 느낌으로", en: "give the title an elegant brush-lettering feel" },
     mood: "moving",
   },
   {
@@ -83,7 +83,7 @@ export const EVENT_PRESETS: EventPreset[] = [
       { ko: "가랜드", en: "garlands" },
       { ko: "풍선", en: "balloons" },
     ],
-    textGuide: { ko: "날짜·장소는 아래쪽에 작게", en: "put the date and place small at the bottom" },
+    textGuide: { ko: "부스 간판에는 글자를 넣지 않기", en: "no text on the booth signs" },
     mood: "bright",
   },
   {
@@ -137,7 +137,7 @@ export const EVENT_PRESETS: EventPreset[] = [
       { ko: "교실 뒤 학부모석", en: "parents at the back" },
       { ko: "창가 화분", en: "window plants" },
     ],
-    textGuide: { ko: "일시·장소 안내 칸은 비워 두기", en: "leave a blank area for time and place" },
+    textGuide: { ko: "안내 글자는 읽기 쉬운 굵은 서체로", en: "use a bold, easy-to-read typeface for the details" },
     mood: "calm",
   },
   {
