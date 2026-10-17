@@ -11,6 +11,7 @@ import {
   type Label,
   type Style,
 } from "@/data/options";
+import { CERT_STYLES, buildCertificatePrompt, certTexts } from "./certificate";
 import type { DayKey } from "./dates";
 import { josa } from "./josa";
 import type { BuilderState, InfoKey, Lang } from "./state";
@@ -70,6 +71,10 @@ export type TextItem = { key: Key | "fixed"; role: Label; text: string; lines?: 
  */
 export function textItems(state: BuilderState, info: ResolvedInfo): { items: TextItem[]; dropped: string[]; max: number } {
   const output = byId(OUTPUT_TYPES, state.output) ?? OUTPUT_TYPES[0];
+  if (output.id === "certificate") {
+    const texts = certTexts(state, info);
+    return { items: texts.map((text) => ({ key: "fixed", role: { ko: "수료증", en: "Certificate" }, text })), dropped: [], max: texts.length };
+  }
   const available: TextItem[] = [];
   for (const key of output.priority as Key[]) {
     if (key === "curriculum") {
@@ -105,6 +110,16 @@ function fillStyle(text: string, vars: { B: string; A: string; hero?: string }):
   return text.replaceAll("{B}", vars.B).replaceAll("{A}", vars.A).replaceAll("{hero}", vars.hero ?? "");
 }
 
+/** 갤러리 카드에 보여 줄 스타일 이름 */
+export function styleBadge(state: BuilderState): { emoji: string; label: string } {
+  if (state.output === "certificate") {
+    const c = CERT_STYLES.find((x) => x.id === state.certStyle) ?? CERT_STYLES[0];
+    return state.certMockup ? { emoji: "📷", label: "홍보용 목업" } : { emoji: c.emoji, label: c.label };
+  }
+  const s = styleFor(state);
+  return { emoji: s.emoji ?? "", label: s.label };
+}
+
 /** 프롬프트에 쓰는 스타일 (고르지 않았으면 홍보물에 맞는 기본값) */
 export function styleFor(state: BuilderState): Style {
   const platform = byId(PLATFORMS, state.platform) ?? PLATFORMS[0];
@@ -113,6 +128,7 @@ export function styleFor(state: BuilderState): Style {
 
 export function buildPrompt(state: BuilderState, lang: Lang, today: DayKey | null = null): string {
   const info = resolveInfo(state, today);
+  if (state.output === "certificate") return buildCertificatePrompt(state, info, lang);
   const output = byId(OUTPUT_TYPES, state.output) ?? OUTPUT_TYPES[0];
   const platform = byId(PLATFORMS, state.platform) ?? PLATFORMS[0];
   const audience = byId(AUDIENCES, state.audience);

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { OUTPUT_TYPES, PLATFORMS, byId } from "@/data/options";
 import type { Example } from "@/data/examples";
-import { colorLabel, styleFor } from "@/lib/prompt";
+import { colorLabel, styleBadge } from "@/lib/prompt";
 import type { BuilderState } from "@/lib/state";
 import CopyButton from "./CopyButton";
 
@@ -56,7 +56,7 @@ export default function ExampleCard({ example, state, prompt, image, onStart, on
             {platform?.label} {platform?.ratio}
           </span>
           <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-zinc-600">
-            {styleFor(state).emoji} {styleFor(state).label}
+            {styleBadge(state).emoji} {styleBadge(state).label}
           </span>
         </div>
         <div>

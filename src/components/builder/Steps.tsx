@@ -11,6 +11,7 @@ import {
   resolveStyle,
   type OutputId,
 } from "@/data/options";
+import { CERT_ROLES, CERT_STYLES } from "@/lib/certificate";
 import { INFO_KEYS, type BuilderState, type InfoKey, type InfoMode } from "@/lib/state";
 import type { ResolvedInfo } from "@/lib/suggest";
 import { Chips, Field, StepCard, Toggle, inputClass } from "../ui";
@@ -110,7 +111,7 @@ type LectureProps = Common & {
 export function StepLecture({ state, onPatch, resolved, onMode, onValue, onShuffle, onCurriculum }: LectureProps) {
   const cert = state.output === "certificate";
   const labels: Partial<Record<InfoKey, string>> = cert
-    ? { title: "과정명", subtitle: "수여 문구", schedule: "수료일", instructor: "강사 서명" }
+    ? { title: "과정명", schedule: "발급일", instructor: "발급자 이름" }
     : state.output === "seminar"
       ? { instructor: "연사(강사)명" }
       : {};
@@ -133,8 +134,10 @@ export function StepLecture({ state, onPatch, resolved, onMode, onValue, onShuff
         <Chips ariaLabel="형식" options={FORMATS} value={state.format} onChange={(id) => id && onPatch({ format: id })} />
       </Field>
 
+      {cert && <CertFields state={state} onPatch={onPatch} />}
+
       <div className="grid gap-3 sm:grid-cols-2">
-        {INFO_KEYS.map((k) => (
+        {INFO_KEYS.filter((k) => !cert || k === "title" || k === "schedule" || k === "instructor").map((k) => (
           <div key={k} className={k === "title" || k === "subtitle" ? "sm:col-span-2" : ""}>
             <InfoRow
               k={k}
@@ -151,6 +154,7 @@ export function StepLecture({ state, onPatch, resolved, onMode, onValue, onShuff
         ))}
       </div>
 
+      {!cert && (
       <div className={`rounded-2xl border p-3 ${cm === "omit" ? "border-dashed border-zinc-200 bg-zinc-50" : "border-zinc-200"}`}>
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <p className={`text-sm font-bold ${cm === "omit" ? "text-zinc-400" : "text-zinc-800"}`}>
@@ -197,11 +201,63 @@ export function StepLecture({ state, onPatch, resolved, onMode, onValue, onShuff
         )}
         {cm === "omit" && <p className="text-xs text-zinc-400">홍보물에 넣지 않아요.</p>}
       </div>
+      )}
     </StepCard>
   );
 }
 
+const CERT_META: { k: keyof BuilderState["cert"]; label: string; placeholder: string }[] = [
+  { k: "no", label: "증서번호", placeholder: "예: 2026-012 (비우면 빼요)" },
+  { k: "name", label: "수료자 성명", placeholder: "비우면 빈 밑줄로 남겨요" },
+  { k: "period", label: "교육기간", placeholder: "예: 2026.10.23 ~ 2026.12.18" },
+  { k: "hours", label: "교육시간", placeholder: "예: 24 (총 24시간)" },
+  { k: "org", label: "발급기관", placeholder: "예: ○○코딩아카데미" },
+];
+
+function CertFields({ state, onPatch }: Common) {
+  const set = (k: keyof BuilderState["cert"], v: string) => onPatch({ cert: { ...state.cert, [k]: v } });
+  return (
+    <div className="rounded-2xl border border-zinc-200 p-3">
+      <p className="mb-2 text-sm font-bold text-zinc-800">
+        수료증 항목 <span className="font-normal text-zinc-400">(실제 수료증 서식 그대로 들어가요)</span>
+      </p>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {CERT_META.map((m) => (
+          <label key={m.k} className="text-xs font-bold text-zinc-600">
+            {m.label}
+            <input
+              aria-label={m.label}
+              value={state.cert[m.k]}
+              onChange={(e) => set(m.k, e.target.value)}
+              placeholder={m.placeholder}
+              className={`${inputClass} mt-1 font-normal`}
+            />
+          </label>
+        ))}
+        <div className="text-xs font-bold text-zinc-600">
+          직함
+          <div role="radiogroup" aria-label="직함" className="mt-1 flex gap-2">
+            {CERT_ROLES.map((r) => (
+              <button
+                key={r}
+                type="button"
+                role="radio"
+                aria-checked={state.cert.role === r}
+                onClick={() => set("role", r)}
+                className={`rounded-xl border px-3 py-2 text-sm ${state.cert.role === r ? "border-ink bg-ink text-white" : "border-zinc-200 bg-white text-zinc-700"}`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function StepDesign({ state, onPatch }: Common) {
+  const cert = state.output === "certificate";
   const custom = !BRAND_COLORS.some((c) => c.id === state.color);
   const auto = resolveStyle(null, state.output, Boolean(byId(PLATFORMS, state.platform)?.print));
   const toggleAvoid = (id: string) =>
@@ -211,11 +267,30 @@ export function StepDesign({ state, onPatch }: Common) {
       <Field label="분위기" hint="다시 누르면 해제">
         <Chips ariaLabel="분위기" allowDeselect options={MOODS} value={state.mood} onChange={(mood) => onPatch({ mood })} />
       </Field>
+      {cert ? (
+        <>
+          <Field label="수료증 스타일" hint="실제 한국 수료증 서식 4가지">
+            <Chips
+              ariaLabel="수료증 스타일"
+              options={CERT_STYLES}
+              value={state.certStyle}
+              onChange={(id) => id && onPatch({ certStyle: id as BuilderState["certStyle"], platform: id === "C" ? "a4l" : "a4" })}
+            />
+            <p className="mt-2 text-xs text-zinc-500">바로 인쇄할 수 있는 정면 평면 원고로 만들어요. 표제는 작게, 항목은 쌍점을 맞춰, 직인은 이름 끝에 겹치게.</p>
+          </Field>
+          <Toggle
+            checked={state.certMockup}
+            onChange={(certMockup) => onPatch({ certMockup })}
+            label="홍보용 목업 사진으로"
+            desc="인쇄용이 아니라 SNS 홍보용: 책상 위에 놓인 수료증 사진"
+          />
+        </>
+      ) : (
+        <>
       <Field label="디자인 스타일" hint={state.style ? "다시 누르면 자동 추천으로" : `자동 추천: ${auto.label}`}>
         <Chips ariaLabel="디자인 스타일" allowDeselect options={STYLES} value={state.style} onChange={(style) => onPatch({ style })} />
         <p className="mt-2 text-xs text-zinc-500">
           스타일마다 서체·구도·색 쓰는 법·질감이 달라요.
-          {state.output === "certificate" && " 수료증은 어떤 스타일이든 바로 인쇄할 수 있는 정면 평면 원고로 만들어요."}
         </p>
       </Field>
       <Field label="메인 장면 · 비주얼" htmlFor="scene" hint="비우면 주제·스타일에 맞춰 자동">
@@ -227,6 +302,8 @@ export function StepDesign({ state, onPatch }: Common) {
           className={inputClass}
         />
       </Field>
+        </>
+      )}
       <Field label="브랜드 컬러">
         <div role="radiogroup" aria-label="브랜드 컬러" className="flex flex-wrap items-center gap-2">
           {BRAND_COLORS.map((c) => (
@@ -256,6 +333,7 @@ export function StepDesign({ state, onPatch }: Common) {
           </label>
         </div>
       </Field>
+      {!cert && (
       <div className="grid gap-2 sm:grid-cols-2">
         <Toggle
           checked={state.photoSlot}
@@ -268,6 +346,7 @@ export function StepDesign({ state, onPatch }: Common) {
         )}
         <Toggle checked={state.qrSlot} onChange={(qrSlot) => onPatch({ qrSlot })} label="QR 코드 빈칸 남기기" desc="신청 링크 QR을 직접 붙일 정사각형 자리" />
       </div>
+      )}
       <Field label="피할 것">
         <div role="group" aria-label="피할 것" className="flex flex-wrap gap-2">
           {AVOID_CHIPS.map((a) => {

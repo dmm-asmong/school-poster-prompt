@@ -7,7 +7,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { OUTPUT_TYPES, PLATFORMS, byId } from "../src/data/options";
 import { EXAMPLES } from "../src/data/examples";
-import { buildPrompt, styleFor } from "../src/lib/prompt";
+import { buildPrompt, styleBadge } from "../src/lib/prompt";
 import { stateFromExample } from "../src/lib/state";
 
 const today = { y: 2026, m: 10, d: 17 };
@@ -19,7 +19,7 @@ const rows = EXAMPLES.map((ex) => {
     title: ex.title,
     output: byId(OUTPUT_TYPES, state.output)?.label,
     platform: platform ? `${platform.label} ${platform.ratio}` : undefined,
-    style: styleFor(state).label,
+    style: styleBadge(state).label,
     file: `public/examples/${ex.id}.webp`,
     prompt: buildPrompt(state, "en", today),
     promptKo: buildPrompt(state, "ko", today),

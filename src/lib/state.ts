@@ -26,6 +26,12 @@ export type BuilderState = {
   sceneEn: string;
   /** 카드뉴스 스와이프 신호 넣기 */
   swipeCue: boolean;
+  /** 수료증 전용 칸 (비우면 빼거나, 성명은 빈 밑줄) */
+  cert: CertInfo;
+  /** 수료증 스타일 A 전통 공문형 / B 모던 기업형 / C 온라인 강의 가로형 / D 따뜻한 아카데미형 */
+  certStyle: "A" | "B" | "C" | "D";
+  /** 수료증 홍보용 목업 사진 (인쇄용 원고 규칙을 빼요) */
+  certMockup: boolean;
   /** 팔레트 id 또는 직접 고른 #RRGGBB */
   color: string;
   info: Record<InfoKey, InfoField>;
@@ -37,6 +43,10 @@ export type BuilderState = {
   avoid: string[];
   seeds: Record<SeedKey, number>;
 };
+
+export type CertInfo = { no: string; name: string; period: string; hours: string; org: string; role: string };
+
+export const DEFAULT_CERT: CertInfo = { no: "", name: "", period: "", hours: "", org: "", role: "대표" };
 
 const field = (mode: InfoMode, value = ""): InfoField => ({ mode, value });
 
@@ -77,6 +87,9 @@ export const DEFAULT_STATE: BuilderState = {
   scene: "",
   sceneEn: "",
   swipeCue: true,
+  cert: DEFAULT_CERT,
+  certStyle: "A",
+  certMockup: false,
   color: "teal",
   info: DEFAULT_INFO,
   curriculum: { mode: "ai", items: ["", "", "", ""] },
@@ -110,7 +123,7 @@ export function switchOutput(state: BuilderState, output: OutputId): BuilderStat
   return {
     ...state,
     output,
-    platform: next.platform,
+    platform: output === "certificate" ? (state.certStyle === "C" ? "a4l" : "a4") : next.platform,
     info,
     curriculum,
     qrSlot: output === "recruit" || output === "seminar" ? state.qrSlot : false,
@@ -118,13 +131,14 @@ export function switchOutput(state: BuilderState, output: OutputId): BuilderStat
 }
 
 /** 갤러리 예시에 담는 값 (칸별로 일부만 적어도 됩니다) */
-export type ExampleState = Partial<Omit<BuilderState, "info" | "seeds" | "curriculum">> & {
+export type ExampleState = Partial<Omit<BuilderState, "info" | "seeds" | "curriculum" | "cert">> & {
+  cert?: Partial<CertInfo>;
   info?: Partial<Record<InfoKey, Partial<InfoField>>>;
   curriculum?: { mode: InfoMode; items?: string[] };
 };
 
 export function stateFromExample(partial: ExampleState): BuilderState {
-  const { info: infoPatch, curriculum, ...rest } = partial;
+  const { info: infoPatch, curriculum, cert, ...rest } = partial;
   let base = DEFAULT_STATE;
   if (rest.output) base = switchOutput(base, rest.output);
   const info = { ...base.info };
@@ -136,6 +150,7 @@ export function stateFromExample(partial: ExampleState): BuilderState {
     ...base,
     ...rest,
     info,
+    cert: { ...DEFAULT_CERT, ...cert },
     curriculum: curriculum ? { mode: curriculum.mode, items } : base.curriculum,
     seeds: DEFAULT_SEEDS,
   };

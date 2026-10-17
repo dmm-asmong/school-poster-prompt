@@ -84,7 +84,7 @@ function scheduleIdeas(state: BuilderState, today: DayKey | null, seed: number):
   const weeks = (seed % 3) * 7;
   if (state.output === "certificate") {
     const d = nextWeekday(today, 5, 7 + weeks);
-    return `${d.getFullYear()}년 ${formatMD(d)}`;
+    return `${d.getFullYear()}년 ${formatMD(d).replace(/\s*\(.\)$/, "")}`;
   }
   if (state.audience === "corporate") {
     const d = nextWeekday(today, 4, 14 + weeks);
@@ -185,7 +185,7 @@ export function resolveInfo(state: BuilderState, today: DayKey | null): Resolved
     schedule: scheduleIdeas(state, today, s.schedule),
     place: pick(placeIdeas(state), s.place),
     price: pick(priceIdeas(state), s.price),
-    instructor: pick(["김OO 강사", "이OO 강사", "박OO 강사"], s.instructor),
+    instructor: pick(state.output === "certificate" ? ["김OO", "이OO", "박OO"] : ["김OO 강사", "이OO 강사", "박OO 강사"], s.instructor),
     bio: pick(bank.bio, s.bio),
     cta: pick(CTAS[state.platform] ?? CTAS.feed, s.cta),
   };
