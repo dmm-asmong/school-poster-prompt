@@ -9,12 +9,11 @@ import { stateFromExample } from "@/lib/state";
 import ExampleCard from "./ExampleCard";
 import ImageLightbox from "./ImageLightbox";
 
-type Props = { images: string[]; onStart: (example: Example) => void; today: DayKey | null };
+type Props = { images: Record<string, string>; onStart: (example: Example) => void; today: DayKey | null };
 
 export default function Gallery({ images, onStart, today }: Props) {
   const [filter, setFilter] = useState<string>("all");
   const [opened, setOpened] = useState<Example | null>(null);
-  const available = useMemo(() => new Set(images), [images]);
   const items = useMemo(
     () =>
       EXAMPLES.map((ex) => {
@@ -23,7 +22,7 @@ export default function Gallery({ images, onStart, today }: Props) {
       }),
     [today],
   );
-  const srcOf = (id: string) => (available.has(id) ? `/examples/${id}.webp` : null);
+  const srcOf = (id: string) => images[id] ?? null;
   const tabs = [
     { id: "all", label: "전체", count: items.length },
     ...OUTPUT_TYPES.map((o) => ({ id: o.id, label: o.label, count: items.filter((i) => i.state.output === o.id).length })).filter((t) => t.count > 0),
@@ -47,7 +46,7 @@ export default function Gallery({ images, onStart, today }: Props) {
           </button>
         ))}
       </div>
-      {available.size > 0 && (
+      {Object.keys(images).length > 0 && (
         <p className="text-xs text-zinc-500">
           🖼️ 이미지는 각 예시 프롬프트로 생성한 AI 예시예요. 가로형(16:9)으로 생성되어 실제 사이즈 비율과 다를 수 있고, 한글이 틀리게 나올 수 있어요.
         </p>

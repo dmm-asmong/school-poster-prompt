@@ -23,7 +23,7 @@ import OutputPanel from "./OutputPanel";
 import { SectionTitle } from "./ui";
 
 /** 빌더 + 결과판 + 예시 갤러리. 모든 처리는 브라우저 안에서만 일어나요. */
-export default function Studio({ images }: { images: string[] }) {
+export default function Studio({ images }: { images: Record<string, string> }) {
   const [state, setState] = useState<BuilderState>(DEFAULT_STATE);
   const [lang, setLang] = useState<Lang>("ko");
   const [channel, setChannel] = useState<Channel>("instagram");

@@ -19,17 +19,17 @@
 | 디자인 | 분위기 6종, 스타일 8종, 브랜드 컬러(팔레트 + 직접 선택), 강사 사진 합성 자리, QR 빈칸, 피할 것 |
 | 홍보 문구 패널 | 인스타(이모지+해시태그)·스레드(대화체, 태그 1개)·블로그(제목+본문+키워드) 템플릿 문구, 전체/해시태그 복사 |
 | 한/영 프롬프트 | 같은 설정을 영어 프롬프트로 전환, 수정 요청 문장 복사 |
-| 예시 갤러리 12개 | '이 예시로 시작'으로 빌더에 불러오기. `public/examples/<id>.webp`가 있으면 이미지, 없으면 미리보기 카드 |
+| 예시 갤러리 12개 | '이 예시로 시작'으로 빌더에 불러오기. `public/examples/<id>.<해시>.webp`가 있으면 이미지, 없으면 미리보기 카드 |
 
 ## 예시 이미지 넣기
 
 ```bash
 npx tsx --tsconfig tsconfig.json scripts/export-instructor-prompts.ts   # raw-examples/instructor-prompts.json
 # raw-examples/<id>.jpg|png 로 이미지를 저장한 뒤
-python3 scripts/optimize-example-images.py                               # public/examples/<id>.webp
+python3 scripts/optimize-example-images.py                               # public/examples/<id>.<hash8>.webp
 ```
 
-빌드할 때 `public/examples/<id>.webp`가 있는 예시만 이미지로 보여 줍니다.
+빌드할 때 `public/examples`에 파일이 있는 예시만 이미지로 보여 줍니다. 파일 이름에 내용 해시가 붙어서 이미지를 바꾸면 캐시된 옛 이미지가 나오지 않아요.
 
 ## 기술 스택
 
