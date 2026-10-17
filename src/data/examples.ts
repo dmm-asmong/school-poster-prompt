@@ -303,7 +303,7 @@ export const EXAMPLES: Example[] = [
       color: "lime",
       info: {
         title: { mode: "ai" },
-        subtitle: { mode: "exact", value: "HTML부터 배포까지, 내 손으로 만드는 첫 웹사이트" },
+        subtitle: { mode: "exact", value: "HTML부터 배포까지 6주 완성" },
         schedule: { mode: "exact", value: "11월 12일(목) 시작 · 매주 목 20:00 (6주)" },
         place: { mode: "exact", value: "Zoom 실시간 라이브" },
         price: { mode: "exact", value: "1기 한정 30% 할인" },

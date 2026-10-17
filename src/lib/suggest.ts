@@ -36,6 +36,16 @@ function titleIdeas(state: BuilderState, bank: TopicBank, topic: string): string
   return [...(byOutput[state.output] ?? []), ...own, ...(byAudience[state.audience] ?? []), ...GENERIC_TITLES.map((x) => fill(x, t))];
 }
 
+/** 주제가 들어간 후보가 모두 카피와 겹칠 때 쓰는 주제 없는 제목 */
+const FALLBACK_TITLES: Record<string, string[]> = {
+  recruit: ["수강생 모집", "지금 신청하세요"],
+  seminar: ["특별 세미나 안내", "무료 특강 안내"],
+  cardnews: ["이것만 알면 됩니다", "지금 알아야 할 것"],
+  thumbnail: ["이것만 보세요", "10분 정리"],
+  certificate: ["과정 수료", "교육 과정 수료"],
+  profile: ["강의·출강 전문 강사", "현장형 실무 강사"],
+};
+
 const GENERIC_TITLES = ["4주 만에 끝내는 {t}", "현업에서 바로 쓰는 {t}", "{t}, 오늘부터 제대로"];
 
 const SUBTITLES: Record<string, string[]> = {
@@ -123,6 +133,23 @@ function bullets(bank: TopicBank, seed: number): string[] {
   return [0, 1, 2].map((i) => list[(start + i) % list.length]);
 }
 
+/** 띄어쓰기·문장부호를 빼고 비교했을 때 한쪽이 다른 쪽을 품으면 겹친다고 봐요. */
+const norm = (t: string) => t.replace(/[^0-9A-Za-z가-힣]/g, "").toLowerCase();
+export function overlaps(a: string, b: string): boolean {
+  const x = norm(a);
+  const y = norm(b);
+  return Boolean(x && y) && (x.includes(y) || y.includes(x));
+}
+
+/** seed 번째부터 돌면서 avoid 와 겹치지 않는 첫 후보 (모두 겹치면 빈 문자열) */
+function pickDistinct(list: string[], seed: number, avoid: string): string {
+  for (let i = 0; i < list.length; i++) {
+    const c = pick(list, seed + i);
+    if (!avoid || !overlaps(c, avoid)) return c;
+  }
+  return "";
+}
+
 function resolveField(mode: InfoMode, value: string, suggestion: string): Resolved {
   if (mode === "omit") return { mode, text: "", suggestion };
   if (mode === "exact") return { mode, text: value.trim(), suggestion };
@@ -135,9 +162,13 @@ export function resolveInfo(state: BuilderState, today: DayKey | null): Resolved
   const topicName = state.topic.trim() || titleValue;
   const bank = findTopic(`${state.topic} ${state.info.title.value}`);
   const s = state.seeds;
+  // 제목과 카피가 같은 말을 되풀이하지 않게: 직접 입력한 쪽을 기준으로 다른 쪽 예시를 고릅니다.
+  const own = (k: InfoKey) => (state.info[k].mode === "omit" ? "" : state.info[k].value.trim());
+  const titleSugg = pickDistinct(titleIdeas(state, bank, topicName), s.title, own("subtitle"));
+  const titleText = state.info.title.mode === "omit" ? "" : own("title") || titleSugg;
   const sugg: Record<InfoKey, string> = {
-    title: pick(titleIdeas(state, bank, topicName), s.title),
-    subtitle: pick(SUBTITLES[state.audience] ?? SUBTITLES.worker, s.subtitle),
+    title: titleSugg || pickDistinct(FALLBACK_TITLES[state.output] ?? FALLBACK_TITLES.recruit, s.title, own("subtitle")),
+    subtitle: pickDistinct(SUBTITLES[state.audience] ?? SUBTITLES.worker, s.subtitle, titleText),
     schedule: scheduleIdeas(state, today, s.schedule),
     place: pick(placeIdeas(state), s.place),
     price: pick(priceIdeas(state), s.price),
