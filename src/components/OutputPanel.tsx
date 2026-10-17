@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FOLLOW_UPS, OUTPUT_TYPES, PLATFORMS, byId } from "@/data/options";
+import { josa } from "@/lib/josa";
 import { CHANNELS, type Caption, type Channel } from "@/lib/caption";
 import type { BuilderState, Lang } from "@/lib/state";
 import { RatioIcon } from "./builder/Steps";
@@ -18,10 +19,12 @@ type Props = {
   onShuffleCaption: () => void;
   onReset: () => void;
   loadedTitle: string | null;
+  dropped: string[];
+  maxText: number;
 };
 
 export default function OutputPanel(props: Props) {
-  const { state, prompt, lang, onLang, caption, channel, onChannel, onShuffleCaption, onReset, loadedTitle } = props;
+  const { state, prompt, lang, onLang, caption, channel, onChannel, onShuffleCaption, onReset, loadedTitle, dropped, maxText } = props;
   const [tab, setTab] = useState<"prompt" | "caption">("prompt");
   const output = byId(OUTPUT_TYPES, state.output);
   const platform = byId(PLATFORMS, state.platform);
@@ -95,6 +98,13 @@ export default function OutputPanel(props: Props) {
           <p data-testid="prompt" className="max-h-80 overflow-y-auto whitespace-pre-wrap rounded-2xl bg-white/5 p-4 text-sm leading-relaxed text-zinc-100 ring-1 ring-white/10">
             {prompt}
           </p>
+          {dropped.length > 0 && (
+            <p data-testid="dropped" className="rounded-xl bg-amber-400/10 px-3 py-2 text-xs leading-relaxed text-amber-200 ring-1 ring-amber-400/30">
+              ✂️ {output?.label}{josa(output?.label ?? "", "은", "는")} 글자 항목을 {maxText}개까지만 넣어요. 깔끔한 디자인을 위해{" "}
+              <b>{dropped.join(", ")}</b>{josa(dropped[dropped.length - 1], "은", "는")} 프롬프트에서 뺐어요.
+              꼭 넣고 싶다면 다른 칸을 &lsquo;넣지 않기&rsquo;로 바꿔 주세요.
+            </p>
+          )}
           <CopyButton text={prompt} label="📋 프롬프트 복사" className="w-full py-3 text-sm" />
           <details className="group rounded-2xl bg-white/5 ring-1 ring-white/10">
             <summary className="cursor-pointer list-none px-4 py-3 text-sm font-bold text-zinc-300 marker:hidden">

@@ -21,7 +21,7 @@ export const EXAMPLES: Example[] = [
       audience: "worker",
       format: "live",
       mood: "energy",
-      style: "tech",
+      style: "swiss",
       color: "blue",
       info: {
         title: { mode: "exact", value: "코딩 몰라도 OK, 4주 완성 파이썬" },
@@ -58,7 +58,7 @@ export const EXAMPLES: Example[] = [
         bio: { mode: "exact", value: "대기업 재무팀 출신 · 기업교육 500회" },
         cta: { mode: "exact", value: "QR 코드 찍고 바로 신청" },
       },
-      curriculum: { mode: "exact", items: ["XLOOKUP 완전 정복", "피벗 테이블로 1분 보고서", "실무 단축키 30가지"] },
+      curriculum: { mode: "omit" },
       qrSlot: true,
     },
   },
@@ -73,8 +73,8 @@ export const EXAMPLES: Example[] = [
       platform: "a4",
       audience: "corporate",
       format: "hybrid",
-      mood: "future",
-      style: "gradient",
+      mood: "trust",
+      style: "saas",
       color: "purple",
       info: {
         title: { mode: "exact", value: "일 잘하는 팀의 ChatGPT 활용법" },
@@ -83,7 +83,7 @@ export const EXAMPLES: Example[] = [
         place: { mode: "exact", value: "본사 대회의실 + Zoom 동시 진행" },
         price: { mode: "omit" },
         instructor: { mode: "exact", value: "박OO 강사" },
-        bio: { mode: "exact", value: "생성형 AI 기업교육 전문 · 공공기관 출강" },
+        bio: { mode: "omit" },
         cta: { mode: "exact", value: "사내 교육 포털에서 신청" },
       },
       curriculum: { mode: "exact", items: ["좋은 프롬프트의 5가지 공식", "보고서·메일 초안 쓰기", "보안·저작권 주의사항"] },
@@ -129,7 +129,7 @@ export const EXAMPLES: Example[] = [
       audience: "jobseeker",
       format: "hybrid",
       mood: "energy",
-      style: "3d",
+      style: "clay",
       color: "orange",
       info: {
         title: { mode: "exact", value: "12주 완성 데이터분석 부트캠프" },
@@ -157,7 +157,7 @@ export const EXAMPLES: Example[] = [
       audience: "senior",
       format: "offline",
       mood: "friendly",
-      style: "illust",
+      style: "photo",
       color: "orange",
       info: {
         title: { mode: "exact", value: "처음 만나는 스마트폰 교실" },
@@ -206,7 +206,7 @@ export const EXAMPLES: Example[] = [
       audience: "corporate",
       format: "offline",
       mood: "trust",
-      style: "business",
+      style: "editorial",
       color: "teal",
       info: {
         title: { mode: "omit" },
@@ -230,7 +230,7 @@ export const EXAMPLES: Example[] = [
       audience: "creator",
       format: "vod",
       mood: "energy",
-      style: "bold",
+      style: "typo",
       color: "yellow",
       info: {
         title: { mode: "exact", value: "AI 툴 5개로 영상 10배 빠르게" },
@@ -249,7 +249,7 @@ export const EXAMPLES: Example[] = [
       audience: "student",
       format: "offline",
       mood: "future",
-      style: "photo",
+      style: "riso",
       color: "navy",
       info: {
         title: { mode: "exact", value: "AI 시대, 개발자 커리어는 어떻게 바뀔까" },
@@ -276,7 +276,7 @@ export const EXAMPLES: Example[] = [
       audience: "creator",
       format: "offline",
       mood: "friendly",
-      style: "illust",
+      style: "saas",
       color: "purple",
       info: {
         title: { mode: "exact", value: "디자인 몰라도 캔바면 충분해" },
@@ -299,7 +299,7 @@ export const EXAMPLES: Example[] = [
       audience: "beginner",
       format: "live",
       mood: "future",
-      style: "tech",
+      style: "swiss",
       color: "lime",
       info: {
         title: { mode: "ai" },

@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { OutputId } from "@/data/options";
 import type { Example } from "@/data/examples";
 import { buildCaption, type Channel } from "@/lib/caption";
-import { buildPrompt } from "@/lib/prompt";
+import { buildPrompt, textItems } from "@/lib/prompt";
 import {
   DEFAULT_STATE,
   stateFromExample,
@@ -33,6 +33,7 @@ export default function Studio({ images }: { images: string[] }) {
   const resolved = resolveInfo(state, today);
   const prompt = buildPrompt(state, lang, today);
   const caption = buildCaption(state, channel, today);
+  const { dropped, max } = textItems(state, resolved);
 
   const patch = (p: Partial<BuilderState>) => setState((s) => ({ ...s, ...p }));
   const bump = (key: SeedKey) => setState((s) => ({ ...s, seeds: { ...s.seeds, [key]: s.seeds[key] + 1 } }));
@@ -112,6 +113,8 @@ export default function Studio({ images }: { images: string[] }) {
               onShuffleCaption={() => bump("caption")}
               onReset={onReset}
               loadedTitle={loaded}
+              dropped={dropped}
+              maxText={max}
             />
           </div>
         </div>

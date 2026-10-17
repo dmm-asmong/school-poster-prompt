@@ -39,8 +39,8 @@ export const DEFAULT_INFO: Record<InfoKey, InfoField> = {
   schedule: field("ai"),
   place: field("ai"),
   price: field("ai"),
-  instructor: field("ai"),
-  bio: field("ai"),
+  instructor: field("omit"),
+  bio: field("omit"),
   cta: field("ai"),
 };
 
@@ -64,7 +64,7 @@ export const DEFAULT_STATE: BuilderState = {
   audience: "worker",
   format: "live",
   mood: "trust",
-  style: "tech",
+  style: "swiss",
   color: "teal",
   info: DEFAULT_INFO,
   curriculum: { mode: "ai", items: ["", "", "", ""] },
