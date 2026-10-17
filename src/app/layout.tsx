@@ -4,13 +4,19 @@ import Header from "@/components/Header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "학교 행사 포스터 프롬프트 빌더",
+  title: "클래스부스트 | 강사를 위한 강의 홍보물 프롬프트 메이커",
   description:
-    "행사명과 몇 번의 탭으로 학교 행사 포스터·현수막·가정통신문용 이미지 AI 프롬프트를 만들어 보세요. 무료, 로그인 없음.",
+    "강의 주제와 대상만 고르면 모집 포스터·특강 안내·카드뉴스·유튜브 썸네일·수료증·강사 프로필 카드용 이미지 AI 프롬프트와 인스타·스레드·블로그 홍보 문구를 한 번에. 무료, 로그인 없음.",
+  openGraph: {
+    title: "클래스부스트 ClassBoost",
+    description: "강사를 위한 강의 홍보물 프롬프트 + SNS 홍보 문구 메이커",
+    type: "website",
+    locale: "ko_KR",
+  },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ec4899",
+  themeColor: "#0e1116",
 };
 
 export default function RootLayout({
@@ -29,7 +35,7 @@ export default function RootLayout({
           referrerPolicy="no-referrer"
         />
       </head>
-      <body className="flex min-h-full flex-col font-sans">
+      <body className="flex min-h-full flex-col bg-paper font-sans">
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

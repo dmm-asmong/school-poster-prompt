@@ -1,74 +1,63 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { EXAMPLE_IMAGES } from "@/data/exampleImages";
-import { EXAMPLE_CATEGORIES, EXAMPLES, type Example, type ExampleCategory } from "@/data/examples";
-import { stateFromExample } from "@/lib/builder";
-import { buildPrompt } from "@/lib/prompt";
+import { OUTPUT_TYPES } from "@/data/options";
+import { EXAMPLES, type Example } from "@/data/examples";
 import type { DayKey } from "@/lib/dates";
+import { buildPrompt } from "@/lib/prompt";
+import { stateFromExample } from "@/lib/state";
 import ExampleCard from "./ExampleCard";
 import ImageLightbox from "./ImageLightbox";
 
-type Props = { onStart: (example: Example) => void; today: DayKey | null };
+type Props = { images: string[]; onStart: (example: Example) => void; today: DayKey | null };
 
-export default function Gallery({ onStart, today }: Props) {
-  const [category, setCategory] = useState<ExampleCategory | "전체">("전체");
+export default function Gallery({ images, onStart, today }: Props) {
+  const [filter, setFilter] = useState<string>("all");
   const [opened, setOpened] = useState<Example | null>(null);
-  const hasImages = Object.keys(EXAMPLE_IMAGES).length > 0;
-
-  const prompts = useMemo(
-    () => new Map(EXAMPLES.map((ex) => [ex.id, buildPrompt(stateFromExample(ex.state), "ko", today)])),
+  const available = useMemo(() => new Set(images), [images]);
+  const items = useMemo(
+    () =>
+      EXAMPLES.map((ex) => {
+        const state = stateFromExample(ex.state);
+        return { ex, state, prompt: buildPrompt(state, "ko", today) };
+      }),
     [today],
   );
-  const list = category === "전체" ? EXAMPLES : EXAMPLES.filter((ex) => ex.category === category);
-  const tabs: (ExampleCategory | "전체")[] = ["전체", ...EXAMPLE_CATEGORIES];
+  const srcOf = (id: string) => (available.has(id) ? `/examples/${id}.webp` : null);
+  const tabs = [
+    { id: "all", label: "전체", count: items.length },
+    ...OUTPUT_TYPES.map((o) => ({ id: o.id, label: o.label, count: items.filter((i) => i.state.output === o.id).length })).filter((t) => t.count > 0),
+  ];
+  const list = filter === "all" ? items : items.filter((i) => i.state.output === filter);
 
   return (
     <div className="space-y-5">
-      {hasImages && (
-        <p className="rounded-2xl bg-white/70 px-4 py-2.5 text-xs leading-relaxed text-slate-500 ring-1 ring-slate-200">
-          🖼️ 카드 이미지는 각 예시의 &lsquo;좋은 프롬프트&rsquo;로 실제 생성한 AI 예시예요. 같은 프롬프트라도 이미지
-          AI 종류와 시도마다 결과가 달라지고, 한글 글자가 틀리게 나올 수 있으니 꼭 확인하세요. 예시 이미지는 가로형으로
-          생성되어 실제 비율과 다를 수 있어요.
-        </p>
-      )}
       <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-        {tabs.map((t) => {
-          const count = t === "전체" ? EXAMPLES.length : EXAMPLES.filter((ex) => ex.category === t).length;
-          return (
-            <button
-              key={t}
-              type="button"
-              aria-pressed={category === t}
-              onClick={() => setCategory(t)}
-              className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                category === t
-                  ? "bg-indigo-600 text-white"
-                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
-              }`}
-            >
-              {t} <span className="text-xs opacity-70">{count}</span>
-            </button>
-          );
-        })}
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {list.map((ex) => (
-          <ExampleCard
-            key={ex.id}
-            example={ex}
-            goodPrompt={prompts.get(ex.id) ?? ""}
-            image={EXAMPLE_IMAGES[ex.id]}
-            onStart={onStart}
-            onOpenImage={setOpened}
-          />
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            aria-pressed={filter === t.id}
+            onClick={() => setFilter(t.id)}
+            className={`shrink-0 rounded-xl px-4 py-2 text-sm font-semibold transition ${
+              filter === t.id ? "bg-ink text-volt" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+            }`}
+          >
+            {t.label} <span className="text-xs opacity-60">{t.count}</span>
+          </button>
         ))}
       </div>
-      <ImageLightbox
-        image={opened ? (EXAMPLE_IMAGES[opened.id] ?? null) : null}
-        title={opened?.title ?? ""}
-        onClose={() => setOpened(null)}
-      />
+      {available.size > 0 && (
+        <p className="text-xs text-zinc-500">
+          🖼️ 이미지는 각 예시 프롬프트로 생성한 AI 예시예요. 가로형(16:9)으로 생성되어 실제 사이즈 비율과 다를 수 있고, 한글이 틀리게 나올 수 있어요.
+        </p>
+      )}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {list.map(({ ex, state, prompt }) => (
+          <ExampleCard key={ex.id} example={ex} state={state} prompt={prompt} image={srcOf(ex.id)} onStart={onStart} onOpen={setOpened} />
+        ))}
+      </div>
+      <ImageLightbox src={opened ? srcOf(opened.id) : null} title={opened?.title ?? ""} onClose={() => setOpened(null)} />
     </div>
   );
 }
