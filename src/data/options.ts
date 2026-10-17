@@ -96,7 +96,7 @@ export const OUTPUT_TYPES: OutputType[] = [
     desc: "과정 수료 · 서명란",
     phrase: { ko: "과정 수료증", en: "course completion certificate" },
     platform: "a4",
-    omit: ["place", "price", "cta", "bio", "badge"],
+    omit: ["place", "price", "cta", "bio", "subtitle"],
     maxText: 5,
     priority: ["title", "schedule", "instructor", "subtitle", "bio", "badge", "curriculum", "place", "price", "cta"],
     fixed: { role: { ko: "표제", en: "Heading" }, text: "수 료 증", first: true },
