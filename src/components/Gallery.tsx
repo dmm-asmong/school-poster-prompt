@@ -28,7 +28,8 @@ export default function Gallery({ onStart, today }: Props) {
       {hasImages && (
         <p className="rounded-2xl bg-white/70 px-4 py-2.5 text-xs leading-relaxed text-slate-500 ring-1 ring-slate-200">
           🖼️ 카드 이미지는 각 예시의 &lsquo;좋은 프롬프트&rsquo;로 실제 생성한 AI 예시예요. 같은 프롬프트라도 이미지
-          AI 종류와 시도마다 결과가 달라지고, 한글 글자가 틀리게 나올 수 있으니 꼭 확인하세요.
+          AI 종류와 시도마다 결과가 달라지고, 한글 글자가 틀리게 나올 수 있으니 꼭 확인하세요. 예시 이미지는 가로형으로
+          생성되어 실제 비율과 다를 수 있어요.
         </p>
       )}
       <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">

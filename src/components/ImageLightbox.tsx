@@ -40,7 +40,8 @@ export default function ImageLightbox({ image, title, onClose }: Props) {
               width={image.width}
               height={image.height}
               sizes="(max-width: 900px) 92vw, 900px"
-              className="mx-auto h-auto max-h-[78vh] w-auto object-contain"
+              loading="eager"
+              className="mx-auto h-auto max-h-[78vh] w-auto max-w-full object-contain"
             />
           </div>
           <figcaption className="flex items-center justify-between gap-3 px-4 py-3">

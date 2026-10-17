@@ -57,8 +57,8 @@ export default function PromptPanel({ prompt, lang, onLangChange, revisions, onT
             alt={`${preview.title} AI 생성 예시 이미지`}
             width={preview.image.width}
             height={preview.image.height}
-            sizes="72px"
-            className="size-16 shrink-0 rounded-xl object-cover"
+            sizes="128px"
+            className="aspect-video w-28 shrink-0 rounded-xl bg-white object-contain"
           />
           <p className="text-xs leading-relaxed text-slate-500">
             <b className="block text-slate-700">불러온 예시: {preview.title}</b>

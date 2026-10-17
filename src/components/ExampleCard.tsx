@@ -14,9 +14,6 @@ type Props = {
 
 export default function ExampleCard({ example, goodPrompt, image, onStart, onOpenImage }: Props) {
   const style = findStyle(example.state.style ?? null);
-  // 아주 넓거나 긴 이미지(현수막·스토리)는 잘리지 않게 contain 으로 보여 줍니다.
-  const ratio = image ? image.width / image.height : 1;
-  const fit = ratio > 1.5 || ratio < 0.6 ? "object-contain" : "object-cover";
   return (
     <article className="flex flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       {image ? (
@@ -24,25 +21,28 @@ export default function ExampleCard({ example, goodPrompt, image, onStart, onOpe
           type="button"
           onClick={() => onOpenImage(example)}
           aria-label={`${example.title} 예시 이미지 크게 보기`}
-          className={`group relative block aspect-[4/3] w-full overflow-hidden bg-gradient-to-br ${example.gradient}`}
+          className="group block w-full text-left"
         >
-          <Image
-            src={image.src}
-            alt={`${example.title} AI 생성 예시 이미지`}
-            width={image.width}
-            height={image.height}
-            loading="lazy"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
-            className={`h-full w-full ${fit} transition duration-300 group-hover:scale-[1.03]`}
-          />
-          <span className="absolute left-2 top-2 rounded-full bg-white/85 px-2 py-0.5 text-[11px] font-semibold text-slate-600 backdrop-blur">
-            {example.category}
+          {/* 예시 이미지는 모두 16:9 가로형이라 aspect-video + contain 으로 글자가 잘리지 않게 전체를 보여 줘요. */}
+          <span className={`relative block aspect-video w-full overflow-hidden bg-gradient-to-br ${example.gradient}`}>
+            <Image
+              src={image.src}
+              alt={`${example.title} AI 생성 예시 이미지`}
+              width={image.width}
+              height={image.height}
+              loading="lazy"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
+              className="h-full w-full object-contain transition duration-300 group-hover:brightness-105"
+            />
+            <span className="absolute left-2 top-2 rounded-full bg-white/85 px-2 py-0.5 text-[11px] font-semibold text-slate-600 shadow-sm backdrop-blur">
+              {example.category}
+            </span>
           </span>
-          <span className="absolute bottom-2 left-2 rounded-full bg-slate-900/70 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur">
-            AI 생성 예시 이미지
-          </span>
-          <span className="absolute bottom-2 right-2 rounded-full bg-white/85 px-2 py-0.5 text-[11px] font-semibold text-slate-700 opacity-90 backdrop-blur">
-            🔍 크게 보기
+          <span className="flex items-center justify-between gap-2 border-b border-slate-100 bg-slate-50 px-3 py-1.5 text-[11px] font-semibold">
+            <span className="text-slate-500">AI 생성 예시 이미지</span>
+            <span className="rounded-full bg-white px-2 py-0.5 text-slate-700 ring-1 ring-slate-200 transition group-hover:bg-slate-900 group-hover:text-white group-hover:ring-slate-900">
+              🔍 크게 보기
+            </span>
           </span>
         </button>
       ) : (
